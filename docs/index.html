@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://api.github.com; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Dictado — habla y se escribe, en Linux</title>
-<meta name="description" content="Dictado por voz y transcripción locales con Whisper para Ubuntu con GNOME. Sin nube, sin cuenta.">
+<title>Dictado — speak, and it types, on Linux</title>
+<meta name="description" content="Local voice dictation and transcription with Whisper for Ubuntu with GNOME. No cloud, no account.">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<meta property="og:title" content="Dictado — habla y se escribe, en Linux">
-<meta property="og:description" content="Pulsa un atajo, habla y el texto aparece donde está el cursor. Todo en tu equipo.">
+<meta property="og:title" content="Dictado — speak, and it types, on Linux">
+<meta property="og:description" content="Press a shortcut, speak, and the text appears at your cursor. Everything stays on your computer.">
 <style>
 :root {
   --bg: #120f1d;
@@ -202,68 +202,68 @@ code { font-family: "JetBrains Mono", ui-monospace, monospace; }
   <div class="wrap">
     <a class="brand" href="#"><img src="icon.svg" alt="">Dictado</a>
     <div class="links">
-      <a href="#features" class="optional">Funciones</a>
-      <a href="#install">Instalar</a>
-      <a href="#how" class="optional">Cómo funciona</a>
-      <a href="#releases" class="optional">Versiones</a>
-      <a href="#privacy" class="optional">Privacidad</a>
+      <a href="#features" class="optional">Features</a>
+      <a href="#install">Install</a>
+      <a href="#how" class="optional">How it works</a>
+      <a href="#releases" class="optional">Releases</a>
+      <a href="#privacy" class="optional">Privacy</a>
       <a href="https://github.com/jdswe/dictado" class="with-icon"><svg class="gl" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
     </div>
   </div>
 </nav>
 <header class="hero wrap">
-  <img class="icon" src="icon.svg" alt="Icono de Dictado">
+  <img class="icon" src="icon.svg" alt="Dictado icon">
   <h1>Dictado</h1>
-  <p>Habla y el texto aparece donde está el cursor, en cualquier app de Ubuntu. Whisper en tu propio equipo: sin nube y sin cuenta.</p>
-  <span class="badge">Última versión <b id="version">…</b> <span id="released"></span></span>
+  <p>Speak, and the text appears at your cursor in any Ubuntu app. Whisper runs on your own computer: no cloud, no account.</p>
+  <span class="badge">Latest version <b id="version">…</b> <span id="released"></span></span>
   <div class="actions">
-    <a class="btn btn-primary" href="#install"><svg class="gl" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 4 4-4 4"/><path d="M12 17h7"/></svg>Instalar con un comando</a>
-    <a class="btn btn-ghost" href="https://github.com/jdswe/dictado/releases/latest"><svg class="gl" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Descargar</a>
-    <a class="btn btn-ghost" href="https://github.com/jdswe/dictado"><svg class="gl" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Código</a>
+    <a class="btn btn-primary" href="#install"><svg class="gl" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 4 4-4 4"/><path d="M12 17h7"/></svg>Install with one command</a>
+    <a class="btn btn-ghost" href="https://github.com/jdswe/dictado/releases/latest"><svg class="gl" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Download</a>
+    <a class="btn btn-ghost" href="https://github.com/jdswe/dictado"><svg class="gl" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Source</a>
   </div>
-  <div class="fine">Ubuntu con GNOME 48–50 en Wayland · español e inglés · software libre (MIT)</div>
-  <div class="demo" aria-label="Ejemplo: dictando en un editor">
+  <div class="fine">Ubuntu with GNOME 48–50 on Wayland · Spanish and English · free and open source (MIT)</div>
+  <div class="demo" aria-label="Example: dictating into an editor">
     <div class="bar"><i></i><i></i><i></i></div>
-    <div class="editor">// TODO<br><b>Mañana reviso el formulario de registro y subo los cambios.</b><span class="caret"></span></div>
-    <div class="pill"><span class="dot">●</span> Escuchando <span class="wave"><i></i><i></i><i></i><i></i><i></i></span></div>
+    <div class="editor">// TODO<br><b>Tomorrow I will review the sign-up form and push the changes.</b><span class="caret"></span></div>
+    <div class="pill"><span class="dot">●</span> Listening <span class="wave"><i></i><i></i><i></i><i></i><i></i></span></div>
   </div>
-  <div class="fine demo-note">Mantén <kbd>Super</kbd> + <kbd>J</kbd>, habla y suelta.</div>
+  <div class="fine demo-note">Hold <kbd>Super</kbd> + <kbd>J</kbd>, speak, and let go.</div>
 </header>
 <main>
 <section id="features">
   <div class="wrap">
-    <h2>Tu voz, escrita</h2>
-    <p class="lead">Una extensión de GNOME pone el atajo y escribe el texto; un servicio en segundo plano se encarga del audio y de Whisper.</p>
+    <h2>Your voice, typed</h2>
+    <p class="lead">A GNOME extension provides the shortcut and types the text; a background service handles the audio and Whisper.</p>
     <div class="grid">
-      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg></span><h3>Dictado</h3><p>Mantén el atajo mientras hablas y suelta: el texto se escribe en VS Code, el navegador, la terminal o cualquier documento.</p><p class="keys"><kbd>Super</kbd> + <kbd>J</kbd> · un toque corto = manos libres</p></div>
-      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12h2M6 8v8M10 5v14M14 9v6M18 7v10M22 12h-2"/></svg></span><h3>Transcripción en vivo</h3><p>Reuniones, clases o vídeos: graba a la vez tu micrófono y el audio del equipo y escribe un .txt con «Yo» y «Otros».</p><p class="keys"><kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd></p></div>
-      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><h3>Archivos</h3><p>Convierte un audio o un vídeo en un .txt junto al original, con la hora de cada frase.</p><p class="keys"><code>dictado transcribe clase.mp4</code></p></div>
-      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><h3>Español e inglés</h3><p>Detecta solo el idioma de cada frase, con tildes, ñ y signos de puntuación.</p></div>
-      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></span><h3>Sin eco</h3><p>Con altavoces, el micrófono también oye a los demás: Dictado reconoce ese eco y no lo apunta dos veces.</p></div>
-      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></span><h3>API D-Bus</h3><p>Otras extensiones pueden añadir un botón de micrófono o mostrar el nivel de tu voz sin incluir nada de audio ni de Whisper.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg></span><h3>Dictation</h3><p>Hold the shortcut while you speak and let go: the text is typed into VS Code, your browser, the terminal or any document.</p><p class="keys"><kbd>Super</kbd> + <kbd>J</kbd> · a quick tap = hands-free</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12h2M6 8v8M10 5v14M14 9v6M18 7v10M22 12h-2"/></svg></span><h3>Live transcription</h3><p>Meetings, classes or videos: records your microphone and your computer’s audio at the same time and writes a .txt labelled “Yo” (you) and “Otros” (others).</p><p class="keys"><kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd></p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><h3>Files</h3><p>Turns an audio or video file into a .txt next to the original, with a timestamp for every sentence.</p><p class="keys"><code>dictado transcribe clase.mp4</code></p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><h3>Spanish and English</h3><p>Detects the language of each sentence by itself, with accents, ñ and punctuation.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></span><h3>No echo</h3><p>With speakers, your microphone also hears the others: Dictado recognizes that echo and does not write it down twice.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></span><h3>D-Bus API</h3><p>Other extensions can add a microphone button or show your voice level without bundling any audio or Whisper code.</p></div>
     </div>
   </div>
 </section>
 <section id="install">
   <div class="wrap">
-    <h2>Instalar</h2>
-    <p class="lead">Un comando descarga la última versión y la instala para tu usuario. No usa sudo.</p>
-    <div class="code"><span id="cmd">curl -fsSL https://jdswe.github.io/dictado/install.sh | bash</span><button type="button" data-copy="cmd">Copiar</button></div>
+    <h2>Install</h2>
+    <p class="lead">One command downloads the latest release, checks its fingerprint, and installs it for your user. No sudo.</p>
+    <div class="code"><span id="cmd">curl -fsSL https://jdswe.github.io/dictado/install.sh | bash</span><button type="button" data-copy="cmd">Copy</button></div>
     <div class="two" style="margin-top:32px">
       <div class="card">
-        <h3>Antes, una vez</h3>
+        <h3>Getting started</h3>
         <ol class="steps">
-          <li>Si Ubuntu no tiene <code>python3-venv</code>: <code>sudo apt install python3-venv ffmpeg</code></li>
-          <li>Ejecuta el comando de arriba. Descarga los modelos una sola vez (unos 350 MB).</li>
-          <li><b>Cierra sesión y vuelve a entrar</b>: verás un micrófono en la barra superior.</li>
+          <li>If Ubuntu lacks <code>python3-venv</code>: <code>sudo apt install python3-venv ffmpeg</code></li>
+          <li>Run the command above. It downloads the models once (about 350 MB).</li>
+          <li><b>Log out and back in</b>: a microphone appears in the top bar.</li>
         </ol>
       </div>
       <div class="card">
-        <h3>Desde el código</h3>
+        <h3>From source</h3>
         <ol class="steps">
           <li><code>git clone https://github.com/jdswe/dictado.git</code></li>
           <li><code>cd dictado &amp;&amp; ./install.sh</code></li>
-          <li>Para quitarlo: <code>./uninstall.sh</code> (tus textos se quedan).</li>
+          <li>To remove it: <code>./uninstall.sh</code> (your texts are kept).</li>
         </ol>
       </div>
     </div>
@@ -272,55 +272,55 @@ code { font-family: "JetBrains Mono", ui-monospace, monospace; }
 <section id="how">
   <div class="wrap two">
     <div>
-      <h2>Sabe quién habla</h2>
-      <p class="lead">No adivina voces: lo que entra por tu micrófono eres tú y lo que suena en el equipo son los demás. Cada línea se guarda en disco en cuanto se transcribe, así que aunque algo se cierre no se pierde nada.</p>
-      <p class="lead">Mientras graba, la barra superior muestra un <b style="color:#ff453a">REC</b> rojo con el tiempo.</p>
+      <h2>It knows who is speaking</h2>
+      <p class="lead">No voice guessing: what comes in through your microphone is you, and what plays on your computer is everyone else. Each line is saved to disk as soon as it is transcribed, so nothing is lost if something closes.</p>
+      <p class="lead">While recording, the top bar shows a red <b style="color:#ff453a">REC</b> with the elapsed time.</p>
     </div>
-    <pre class="transcript"><span class="t"># Transcripción 2026-11-18 14:03</span>
+    <pre class="transcript"><span class="t"># Transcript 2026-11-18 14:03</span>
 
-<span class="t">[14:03:15]</span> <span class="otros">Otros:</span> Bueno, empecemos con la revisión.
-<span class="t">[14:03:21]</span> <span class="yo">Yo:</span> Vale, yo terminé el formulario.
-<span class="t">[14:03:27]</span> <span class="otros">Otros:</span> Perfecto, ¿y las pruebas?</pre>
+<span class="t">[14:03:15]</span> <span class="otros">Otros:</span> OK, let’s start the review.
+<span class="t">[14:03:21]</span> <span class="yo">Yo:</span> Sure, I finished the sign-up form.
+<span class="t">[14:03:27]</span> <span class="otros">Otros:</span> Great, and the tests?</pre>
   </div>
 </section>
 <section id="speed">
   <div class="wrap">
-    <h2>Rápido sin tarjeta gráfica</h2>
-    <p class="lead">faster-whisper en el procesador, medido en un portátil con AMD Ryzen 5 7520U.</p>
+    <h2>Fast without a graphics card</h2>
+    <p class="lead">faster-whisper on the CPU, measured on a laptop with an AMD Ryzen 5 7520U.</p>
     <table>
-      <tr><th>Modelo</th><th>60 s de voz</th><th>Se usa para</th></tr>
-      <tr><td>small</td><td>~29 s</td><td>Dictado y archivos. Un dictado corto tarda unos 3–5 s.</td></tr>
-      <tr><td>base</td><td>~10 s</td><td>Transcripción en vivo, a tiempo real con dos fuentes.</td></tr>
-      <tr><td>tiny</td><td>~3 s</td><td>Solo detectar el idioma.</td></tr>
+      <tr><th>Model</th><th>60 s of speech</th><th>Used for</th></tr>
+      <tr><td>small</td><td>~29 s</td><td>Dictation and files. A short dictation takes about 3–5 s.</td></tr>
+      <tr><td>base</td><td>~10 s</td><td>Live transcription, keeping up in real time with two sources.</td></tr>
+      <tr><td>tiny</td><td>~3 s</td><td>Language detection only.</td></tr>
     </table>
   </div>
 </section>
 <section id="releases">
   <div class="wrap">
-    <h2>Novedades</h2>
-    <p class="lead">Leídas en directo de GitHub Releases.</p>
-    <div id="release-list" class="grid" style="grid-template-columns:1fr"><div class="card">Cargando versiones…</div></div>
+    <h2>What's new</h2>
+    <p class="lead">Read live from GitHub Releases.</p>
+    <div id="release-list" class="grid" style="grid-template-columns:1fr"><div class="card">Loading releases…</div></div>
   </div>
 </section>
 <section id="faq">
   <div class="wrap">
-    <h2>Preguntas</h2>
-    <details><summary>¿Por qué una extensión de GNOME?</summary><p>En Wayland una app normal no puede escribir en otra. La extensión corre dentro de GNOME: entrega el texto por el método de entrada (como el teclado en pantalla) y, si la app no lo admite, lo pega con el portapapeles y lo restaura después. Sin root, sin <code>/dev/uinput</code> y sin diálogos de permiso.</p></details>
-    <details><summary>Pulso Super+J y solo se escribe una «j»</summary><p>GNOME aún no ha cargado la extensión: cierra sesión y vuelve a entrar una vez después de instalar.</p></details>
-    <details><summary>¿Puedo cambiar el atajo?</summary><p>Sí, en Extensiones → Dictado → Configuración. Super+H se deja para minimizar ventanas, como en GNOME.</p></details>
-    <details><summary>¿Va más rápido?</summary><p>En <code>~/.config/dictado/config.toml</code> pon <code>dictation_model = "base"</code> (algo menos preciso) o, si solo hablas un idioma, <code>languages = ["es"]</code>.</p></details>
-    <details><summary>¿Funciona con Macify?</summary><p>Son proyectos separados. Macify podrá añadir un botón de micrófono que hable con Dictado por D-Bus.</p></details>
+    <h2>Questions</h2>
+    <details><summary>Why a GNOME extension?</summary><p>On Wayland, a normal app cannot type into another one. The extension runs inside GNOME: it delivers the text through the input method (like the on-screen keyboard) and, when an app does not support that, pastes it through the clipboard and then restores what you had copied. No root, no <code>/dev/uinput</code> and no permission dialogs.</p></details>
+    <details><summary>I press Super+J and only a “j” is typed</summary><p>GNOME has not loaded the extension yet: log out and back in once after installing.</p></details>
+    <details><summary>Can I change the shortcut?</summary><p>Yes, in Extensions → Dictado → Settings. Super+H is left for minimizing windows, as in GNOME.</p></details>
+    <details><summary>Can it be faster?</summary><p>In <code>~/.config/dictado/config.toml</code> set <code>dictation_model = "base"</code> (slightly less accurate) or, if you only speak one language, <code>languages = ["es"]</code>.</p></details>
+    <details><summary>Does it work with Macify?</summary><p>They are separate projects. Macify can add a microphone button that talks to Dictado over D-Bus.</p></details>
   </div>
 </section>
 <section id="privacy">
   <div class="wrap">
-    <h2>Privacidad</h2>
-    <p class="lead">Tu voz no sale de tu equipo.</p>
+    <h2>Privacy</h2>
+    <p class="lead">Your voice never leaves your computer.</p>
     <div class="grid">
-      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><h3>Todo local</h3><p>El audio se procesa en tu equipo y no se guarda: solo el texto. Sin cuenta, sin analíticas y sin servidor.</p></div>
-      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4" fill="#fff" stroke="none"/></svg></span><h3>Consentimiento</h3><p>La transcripción en vivo graba a otras personas. Avísales y pide permiso: en muchos lugares es obligatorio.</p></div>
-      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span><h3>Una descarga</h3><p>Solo se conecta a internet para bajar los modelos de Whisper (Hugging Face), una vez.</p></div>
-      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg></span><h3>Esta web</h3><p>No usa cookies ni guarda nada en tu navegador. Lee la lista de versiones de la API pública de GitHub.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><h3>Everything local</h3><p>Audio is processed on your computer and never saved: only the text is. No account, no analytics, no server.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4" fill="#fff" stroke="none"/></svg></span><h3>Consent</h3><p>Live transcription records other people. Tell them and ask for permission: in many places it is required by law.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span><h3>One download</h3><p>It only goes online to fetch the Whisper models from Hugging Face, once.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg></span><h3>This website</h3><p>Sets no cookies and stores nothing in your browser. It reads the release list from GitHub’s public API.</p></div>
     </div>
   </div>
 </section>
@@ -330,33 +330,33 @@ code { font-family: "JetBrains Mono", ui-monospace, monospace; }
     <div class="foot-grid">
       <div class="foot-brand">
         <a class="brand" href="#"><img src="icon.svg" alt="">Dictado</a>
-        <p>Dictado por voz y transcripción locales para Ubuntu con GNOME. Software libre.</p>
-        <a class="foot-source" href="https://github.com/jdswe/dictado"><svg class="gl" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Código en GitHub</a>
+        <p>Local voice dictation and transcription for Ubuntu with GNOME. Free software.</p>
+        <a class="foot-source" href="https://github.com/jdswe/dictado"><svg class="gl" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Source on GitHub</a>
       </div>
       <div class="foot-col">
-        <h4>Producto</h4>
-        <a href="#features">Funciones</a>
-        <a href="#install">Instalar</a>
-        <a href="#releases">Versiones</a>
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="#install">Install</a>
+        <a href="#releases">Releases</a>
       </div>
       <div class="foot-col">
-        <h4>Ayuda</h4>
-        <a href="https://github.com/jdswe/dictado#readme">Guía</a>
-        <a href="#faq">Preguntas</a>
-        <a href="https://github.com/jdswe/dictado/issues/new">Informar de un problema</a>
+        <h4>Help</h4>
+        <a href="https://github.com/jdswe/dictado#readme">Guide</a>
+        <a href="#faq">Questions</a>
+        <a href="https://github.com/jdswe/dictado/issues/new">Report a problem</a>
       </div>
       <div class="foot-col">
-        <h4>Proyectos</h4>
+        <h4>Projects</h4>
         <a href="https://jdswe.github.io/macify/">Macify</a>
-        <a href="https://github.com/jdswe/dictado/blob/main/LICENSE">Licencia (MIT)</a>
+        <a href="https://github.com/jdswe/dictado/blob/main/LICENSE">License (MIT)</a>
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© 2026 Jose David Carranza Angarita. Dictado es software libre bajo licencia MIT.</span>
-      <span>Sin cookies · Sin rastreo · Sin cuenta</span>
+      <span>© 2026 Jose David Carranza Angarita. Dictado is free software under the MIT License.</span>
+      <span>No cookies · No tracking · No account</span>
     </div>
-    <p class="foot-note">Usa <a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper</a> y los modelos
-      <a href="https://github.com/openai/whisper">Whisper</a> de OpenAI, cada uno con su licencia.</p>
+    <p class="foot-note">Uses <a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper</a> and OpenAI’s
+      <a href="https://github.com/openai/whisper">Whisper</a> models, each under its own license.</p>
   </div>
 </footer>
 <script>
@@ -397,24 +397,24 @@ async function loadReleases() {
     const latest = releases[0];
     document.getElementById("version").textContent = latest.tag_name;
     document.getElementById("released").textContent =
-      "· " + new Date(latest.published_at).toLocaleDateString("es", { year: "numeric", month: "short", day: "numeric" });
+      "· " + new Date(latest.published_at).toLocaleDateString("en", { year: "numeric", month: "short", day: "numeric" });
     list.innerHTML = releases.map((r, i) => `
       <article class="card release">
-        <header><h3>${escapeHtml(r.name || r.tag_name)}${i === 0 ? '<span class="latest">Última</span>' : ""}</h3>
-        <time>${new Date(r.published_at).toLocaleDateString("es")}</time></header>
+        <header><h3>${escapeHtml(r.name || r.tag_name)}${i === 0 ? '<span class="latest">Latest</span>' : ""}</h3>
+        <time>${new Date(r.published_at).toLocaleDateString("en")}</time></header>
         ${renderNotes(r.body)}
       </article>`).join("");
   } catch (error) {
-    document.getElementById("version").textContent = "en GitHub";
-    list.innerHTML = '<div class="card">Todas las versiones en <a href="https://github.com/jdswe/dictado/releases">GitHub Releases</a>.</div>';
+    document.getElementById("version").textContent = "on GitHub";
+    list.innerHTML = '<div class="card">See all versions on <a href="https://github.com/jdswe/dictado/releases">GitHub Releases</a>.</div>';
   }
 }
 
 document.querySelectorAll("[data-copy]").forEach(button => {
   button.addEventListener("click", async () => {
     await navigator.clipboard.writeText(document.getElementById(button.dataset.copy).textContent);
-    button.textContent = "Copiado";
-    setTimeout(() => (button.textContent = "Copiar"), 1600);
+    button.textContent = "Copied";
+    setTimeout(() => (button.textContent = "Copy"), 1600);
   });
 });
 
