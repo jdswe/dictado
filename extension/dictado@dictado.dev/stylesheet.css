@@ -1,0 +1,46 @@
+.dictado-indicator-recording .system-status-icon,
+.dictado-indicator-recording {
+  color: #ff453a;
+}
+
+.dictado-rec-label {
+  color: #ff453a;
+  font-weight: bold;
+  font-feature-settings: "tnum";
+  padding-left: 4px;
+}
+
+/* Píldora flotante mientras se dicta (fondo opaco). */
+.dictado-pill {
+  background-color: #1c1c1e;
+  color: #ffffff;
+  border: 1px solid #3a3a3c;
+  border-radius: 999px;
+  padding: 8px 16px;
+  spacing: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.dictado-pill-dot {
+  color: #ff453a;
+  font-size: 14px;
+}
+
+.dictado-pill-label {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.dictado-bars {
+  spacing: 3px;
+}
+
+.dictado-bar {
+  background-color: #ff453a;
+  border-radius: 2px;
+  width: 4px;
+}
+
+.dictado-pill-processing .dictado-bar {
+  background-color: #8e8e93;
+}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.dictado" path="/org/gnome/shell/extensions/dictado/">
+    <key name="dictation-shortcut" type="as">
+      <default><![CDATA[['<Super>h']]]></default>
+      <summary>Atajo de dictado</summary>
+      <description>Mantener pulsado = hablar mientras se mantiene; toque corto = empezar/terminar.</description>
+    </key>
+    <key name="transcription-shortcut" type="as">
+      <default><![CDATA[['<Super><Shift>h']]]></default>
+      <summary>Atajo de la transcripción en vivo</summary>
+    </key>
+    <key name="hold-threshold" type="i">
+      <default>350</default>
+      <summary>Milisegundos para considerar que el atajo se mantiene pulsado</summary>
+    </key>
+    <key name="insert-method" type="s">
+      <choices>
+        <choice value="auto"/>
+        <choice value="input-method"/>
+        <choice value="paste"/>
+      </choices>
+      <default>'auto'</default>
+      <summary>Cómo insertar el texto</summary>
+      <description>auto: método de entrada si la app lo admite, si no portapapeles + Ctrl+V.</description>
+    </key>
+    <key name="restore-clipboard" type="b">
+      <default>true</default>
+      <summary>Restaurar el portapapeles después de pegar</summary>
+    </key>
+    <key name="append-space" type="b">
+      <default>true</default>
+      <summary>Añadir un espacio después de cada dictado</summary>
+    </key>
+    <key name="show-indicator" type="b">
+      <default>true</default>
+      <summary>Mostrar el icono en la barra superior</summary>
+    </key>
+  </schema>
+</schemalist>

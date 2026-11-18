@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=dev.dictado.Dictado
+Exec=@BIN@ serve
+SystemdService=dictado.service

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dictado"
+version = "0.1.0"
+description = "Dictado por voz y transcripción local (Whisper) para GNOME en Wayland"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+    "faster-whisper>=1.1",
+    "numpy",
+]
+
+[project.scripts]
+dictado = "dictado.cli:main"
+
+[tool.setuptools]
+packages = ["dictado"]
+
+[tool.setuptools.package-data]
+dictado = ["*.xml"]
