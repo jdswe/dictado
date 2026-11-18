@@ -59,7 +59,15 @@ rm -rf "$EXT_DIR"
 mkdir -p "$EXT_DIR"
 cp -r "$REPO/extension/$UUID/." "$EXT_DIR/"
 glib-compile-schemas "$EXT_DIR/schemas"
-gnome-extensions enable "$UUID" 2>/dev/null || true
+# Si GNOME aún no conoce la extensión (Wayland: hasta volver a entrar), se
+# añade a la lista de activas para que cargue al iniciar sesión.
+gnome-extensions enable "$UUID" 2>/dev/null || python3 - "$UUID" <<'PY'
+import ast, subprocess, sys
+cur = ast.literal_eval(subprocess.check_output(
+    ["gsettings", "get", "org.gnome.shell", "enabled-extensions"], text=True).replace("@as ", ""))
+if sys.argv[1] not in cur:
+    subprocess.check_call(["gsettings", "set", "org.gnome.shell", "enabled-extensions", str(cur + [sys.argv[1]])])
+PY
 
 # 6. Avisar si el atajo choca con otro de GNOME (no se cambia nada)
 if gsettings list-recursively 2>/dev/null | grep -qiF "'<Super>j'"; then
@@ -74,6 +82,5 @@ echo
 say "Listo."
 if ! gnome-extensions info "$UUID" 2>/dev/null | grep -qi "ACTIVE\|Activ"; then
     echo "  Cierra sesión y vuelve a entrar para que GNOME cargue la extensión."
-    echo "  Después: gnome-extensions enable $UUID"
 fi
 echo "  Dictar: Super+J · Transcripción en vivo: Super+Shift+J · Archivos: dictado transcribe ARCHIVO"
