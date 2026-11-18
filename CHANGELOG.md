@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 — 2026-11-18
+
+- Notifications for saved transcripts and transcribed files now preview the first lines of text. Click one (in the banner or in the notification list) to open the file, or use **Show in Folder**. They appear under Dictado's own name and icon.
+
 ## 0.2.0 — 2026-11-18
 
 - **Spanish and English in the same recording**: the language is now detected phrase by phrase, so switching languages mid-sentence no longer drops or translates the other one. Applies to dictation, live transcripts and files.

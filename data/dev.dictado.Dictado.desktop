@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Dictado
+Comment=Local voice dictation and transcription
+Icon=audio-input-microphone
+Exec=dictado pick
+NoDisplay=true
+Categories=Utility;

@@ -14,25 +14,12 @@ from dictado import config as config_mod
 from dictado.dictation import Recorder, save_dictation
 from dictado.engine import Engine
 from dictado.files import output_path, transcribe_file
+from dictado.notify import Notifier
 from dictado.transcription import LiveTranscription, transcript_path
 
 log = logging.getLogger(__name__)
 
 XML = (Path(__file__).parent / "dev.dictado.Dictado1.xml").read_text(encoding="utf-8")
-
-
-def notify(summary: str, body: str = "", icon: str = "audio-input-microphone-symbolic",
-           urgent: bool = False) -> None:
-    """Desktop notification (org.freedesktop.Notifications)."""
-    try:
-        hints = {"urgency": GLib.Variant("y", 2 if urgent else 1)}
-        Gio.bus_get_sync(Gio.BusType.SESSION).call(
-            "org.freedesktop.Notifications", "/org/freedesktop/Notifications",
-            "org.freedesktop.Notifications", "Notify",
-            GLib.Variant("(susssasa{sv}i)", ("Dictado", 0, icon, summary, body, [], hints, -1)),
-            None, Gio.DBusCallFlags.NONE, -1, None, None, None)
-    except Exception:  # noqa: BLE001
-        log.debug("Could not notify", exc_info=True)
 
 
 class Service:
@@ -48,6 +35,7 @@ class Service:
         self.model_ready = False
         self._last_level = 0.0
         self._file_lock = threading.Lock()
+        self.notifier = Notifier()
 
     # -- D-Bus plumbing ---------------------------------------------------
     def register(self, conn: Gio.DBusConnection) -> None:
@@ -182,7 +170,7 @@ class Service:
         self.live.start()
         self.transcription = "recording"
         self._state_changed()
-        notify("Recording and transcribing",
+        self.notifier.send("Recording and transcribing",
                "Your microphone and the system audio are being recorded. Let everyone know.",
                icon="media-record-symbolic", urgent=True)
         return GLib.Variant("(s)", (str(path),))
@@ -197,7 +185,7 @@ class Service:
 
         def finish():
             live.stop()
-            notify("Transcript saved", path, icon="document-save-symbolic")
+            self.notifier.send("Transcript saved", icon="document-save-symbolic", file=Path(path))
         threading.Thread(target=finish, name="stop-live", daemon=True).start()
         return GLib.Variant("(s)", (path,))
 
@@ -228,7 +216,7 @@ class Service:
                 try:
                     transcribe_file(self.engine, self.cfg.dictation_model, src, out, progress)
                     self.emit("FileDone", "ss", str(src), str(out))
-                    notify("File transcribed", str(out), icon="document-save-symbolic")
+                    self.notifier.send(f"Transcribed {src.name}", icon="document-save-symbolic", file=out)
                 except Exception as e:  # noqa: BLE001
                     log.exception("Error transcribing %s", src)
                     self.emit("Error", "s", f"{src.name}: {e}")

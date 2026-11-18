@@ -64,6 +64,11 @@ systemctl --user daemon-reload
 systemctl --user enable dictado.service >/dev/null 2>&1 || true
 systemctl --user restart dictado.service || true
 
+# Desktop entry: gives notifications Dictado's name and icon.
+mkdir -p "$PREFIX/applications"
+sed "s|^Exec=dictado|Exec=$VENV/bin/dictado|" "$REPO/data/dev.dictado.Dictado.desktop" \
+    > "$PREFIX/applications/dev.dictado.Dictado.desktop"
+
 # 5. GNOME Shell extension
 say "Installing the GNOME Shell extension"
 rm -rf "$EXT_DIR"
