@@ -1,22 +1,22 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
  "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <!--
-  API de Dictado en el bus de sesión.
-  Nombre: dev.dictado.Dictado   Objeto: /dev/dictado/Dictado
-  El servicio se arranca solo (activación D-Bus) al llamar a cualquier método.
+  Dictado's API on the session bus.
+  Name: dev.dictado.Dictado   Object: /dev/dictado/Dictado
+  The service starts by itself (D-Bus activation) when any method is called.
 
-  Estados de dictado:       idle | recording | processing
-  Estados de transcripción: idle | recording
+  Dictation states:       idle | recording | processing
+  Transcription states:   idle | recording
 -->
 <node>
   <interface name="dev.dictado.Dictado1">
-    <!-- Dictado (solo micrófono). Al terminar se emite DictationText. -->
+    <!-- Dictation (microphone only). DictationText is emitted when done. -->
     <method name="StartDictation"/>
     <method name="StopDictation"/>
     <method name="CancelDictation"/>
     <method name="Toggle"/>
 
-    <!-- Transcripción en vivo (micrófono + audio del sistema). -->
+    <!-- Live transcription (microphone + system audio). -->
     <method name="StartTranscription">
       <arg type="s" name="path" direction="out"/>
     </method>
@@ -25,8 +25,8 @@
     </method>
     <method name="ToggleTranscription"/>
 
-    <!-- Transcribe un archivo de audio/vídeo en segundo plano. Devuelve la
-         ruta del .txt que se va a escribir; FileDone avisa al terminar. -->
+    <!-- Transcribe an audio/video file in the background. Returns the path
+         of the .txt that will be written; FileDone signals completion. -->
     <method name="TranscribeFile">
       <arg type="s" name="path" direction="in"/>
       <arg type="s" name="output" direction="out"/>
@@ -48,16 +48,16 @@
       <arg type="s" name="dictation"/>
       <arg type="s" name="transcription"/>
     </signal>
-    <!-- Texto final del dictado, para insertarlo donde está el cursor. -->
+    <!-- Final dictation text, to be typed at the cursor. -->
     <signal name="DictationText">
       <arg type="s" name="text"/>
       <arg type="s" name="language"/>
     </signal>
-    <!-- Nivel del micrófono 0..1 mientras se dicta (~10 veces/s). -->
+    <!-- Microphone level 0..1 while dictating (~10 times/s). -->
     <signal name="Level">
       <arg type="d" name="level"/>
     </signal>
-    <!-- Cada línea nueva de la transcripción en vivo. time = ms unix. -->
+    <!-- Each new live transcript line. time = unix ms. -->
     <signal name="TranscriptLine">
       <arg type="s" name="speaker"/>
       <arg type="s" name="text"/>

@@ -1,9 +1,9 @@
 {
   "uuid": "dictado@dictado.dev",
   "name": "Dictado",
-  "description": "Dictado por voz local (Whisper): pulsa un atajo, habla y el texto aparece donde está el cursor. Indicador de grabación para la transcripción en vivo.",
+  "description": "Local voice dictation (Whisper): press a shortcut, speak, and the text appears at your cursor. Recording indicator for live transcripts.",
   "shell-version": ["48", "49", "50"],
   "settings-schema": "org.gnome.shell.extensions.dictado",
   "gettext-domain": "dictado",
-  "version-name": "0.1.0"
+  "version-name": "0.2.0"
 }

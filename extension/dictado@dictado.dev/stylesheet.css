@@ -44,3 +44,9 @@
 .dictado-pill-processing .dictado-bar {
   background-color: #8e8e93;
 }
+
+.dictado-shortcut-hint {
+  color: rgba(127, 127, 127, 0.95);
+  padding-left: 24px;
+  font-feature-settings: "tnum";
+}

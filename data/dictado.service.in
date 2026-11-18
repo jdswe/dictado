@@ -1,5 +1,5 @@
 [Unit]
-Description=Dictado: dictado por voz y transcripción local (Whisper)
+Description=Dictado: local voice dictation and transcription (Whisper)
 PartOf=graphical-session.target
 After=graphical-session.target pipewire.service
 
@@ -8,7 +8,7 @@ Type=dbus
 BusName=dev.dictado.Dictado
 ExecStart=@BIN@ serve
 Restart=on-failure
-# Whisper usa toda la CPU disponible: que no le quite fluidez al escritorio.
+# Whisper uses all the CPU it can get: keep the desktop smooth.
 Nice=5
 
 [Install]

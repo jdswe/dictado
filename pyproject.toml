@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dictado"
-version = "0.1.0"
-description = "Dictado por voz y transcripción local (Whisper) para GNOME en Wayland"
+version = "0.2.0"
+description = "Local voice dictation and transcription (Whisper) for GNOME on Wayland"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"

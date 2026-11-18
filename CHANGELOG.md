@@ -1,12 +1,18 @@
-# Cambios
+# Changelog
+
+## 0.2.0 — 2026-11-18
+
+- **Spanish and English in the same recording**: the language is now detected phrase by phrase, so switching languages mid-sentence no longer drops or translates the other one. Applies to dictation, live transcripts and files.
+- Live transcripts use the more accurate model for your own voice (the system audio keeps the faster one).
+- **Everything in English**: top bar menu with short labels and shortcut hints (Dictate, Live Transcript, Transcribe File…), settings, notifications, transcript files (`Me` / `Others`) and folders (`~/Documents/Dictations`, `~/Documents/Transcripts`). An untouched 0.1.0 config and the old Spanish folders are migrated automatically.
 
 ## 0.1.0 — 2026-11-18
 
-Primera versión.
+First release.
 
-- **Dictado**: mantén **Super+J**, habla y suelta; el texto se escribe donde está el cursor, en cualquier app. Un toque corto activa el modo manos libres.
-- **Transcripción en vivo** (**Super+Shift+J**): micrófono («Yo») y audio del sistema («Otros») en un `.txt` ordenado por hora, guardado al momento, con filtro de eco para altavoces e indicador REC.
-- **Archivos**: `dictado transcribe video.mp4` crea `video.txt` con marcas de tiempo.
-- Whisper local con faster-whisper (CPU, int8); español e inglés detectados solos.
-- API D-Bus `dev.dictado.Dictado` para otras extensiones.
-- Instalación sin sudo: `curl -fsSL https://jdswe.github.io/dictado/install.sh | bash`
+- **Dictation**: hold **Super+J**, speak and let go; the text is typed at your cursor in any app. A quick tap starts hands-free mode.
+- **Live transcript** (**Super+Shift+J**): your microphone and the system audio go into a `.txt` ordered by time and saved as it goes, with an echo filter for speakers and a REC indicator.
+- **Files**: `dictado transcribe video.mp4` writes `video.txt` with timestamps.
+- Local Whisper via faster-whisper (CPU, int8); Spanish and English detected automatically.
+- D-Bus API `dev.dictado.Dictado` for other extensions.
+- Install without sudo: `curl -fsSL https://jdswe.github.io/dictado/install.sh | bash`

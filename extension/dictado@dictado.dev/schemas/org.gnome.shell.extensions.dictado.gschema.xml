@@ -3,16 +3,16 @@
   <schema id="org.gnome.shell.extensions.dictado" path="/org/gnome/shell/extensions/dictado/">
     <key name="dictation-shortcut" type="as">
       <default><![CDATA[['<Super>j']]]></default>
-      <summary>Atajo de dictado</summary>
-      <description>Mantener pulsado = hablar mientras se mantiene; toque corto = empezar/terminar.</description>
+      <summary>Dictation shortcut</summary>
+      <description>Hold = talk while held; quick tap = start/stop.</description>
     </key>
     <key name="transcription-shortcut" type="as">
       <default><![CDATA[['<Super><Shift>j']]]></default>
-      <summary>Atajo de la transcripción en vivo</summary>
+      <summary>Live transcript shortcut</summary>
     </key>
     <key name="hold-threshold" type="i">
       <default>350</default>
-      <summary>Milisegundos para considerar que el atajo se mantiene pulsado</summary>
+      <summary>Milliseconds after which the shortcut counts as held</summary>
     </key>
     <key name="insert-method" type="s">
       <choices>
@@ -21,20 +21,20 @@
         <choice value="paste"/>
       </choices>
       <default>'auto'</default>
-      <summary>Cómo insertar el texto</summary>
-      <description>auto: método de entrada si la app lo admite, si no portapapeles + Ctrl+V.</description>
+      <summary>How to insert the text</summary>
+      <description>auto: the input method when the app supports it, otherwise clipboard + Ctrl+V.</description>
     </key>
     <key name="restore-clipboard" type="b">
       <default>true</default>
-      <summary>Restaurar el portapapeles después de pegar</summary>
+      <summary>Restore the clipboard after pasting</summary>
     </key>
     <key name="append-space" type="b">
       <default>true</default>
-      <summary>Añadir un espacio después de cada dictado</summary>
+      <summary>Add a space after each dictation</summary>
     </key>
     <key name="show-indicator" type="b">
       <default>true</default>
-      <summary>Mostrar el icono en la barra superior</summary>
+      <summary>Show the icon in the top bar</summary>
     </key>
   </schema>
 </schemalist>

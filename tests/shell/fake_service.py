@@ -1,4 +1,4 @@
-"""Servicio D-Bus falso: comprueba la conexión con la extensión."""
+"""Fake D-Bus service: checks the connection with the extension."""
 import sys
 from pathlib import Path
 
@@ -40,7 +40,7 @@ def script():
     emit("StateChanged", "ss", "processing", "idle")
     emit("DictationText", "ss", "Hola mundo", "es")
     emit("StateChanged", "ss", "idle", "recording")
-    GLib.timeout_add(1500, lambda: (emit("StateChanged", "ss", "idle", "idle"), print("señales enviadas", flush=True), False)[2])
+    GLib.timeout_add(1500, lambda: (emit("StateChanged", "ss", "idle", "idle"), print("signals sent", flush=True), False)[2])
     return False
 
 

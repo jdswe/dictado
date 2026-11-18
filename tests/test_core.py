@@ -12,7 +12,7 @@ def test_echo_detects_repeated_speech():
     assert not is_echo("vale, yo creo que hay que cambiar el test", [system])
     assert not is_echo("sí", ["no lo sé"])
     assert is_echo("Sí.", ["sí"])
-    assert echo_ratio("Canción", "cancion") == 1.0  # sin tildes ni mayúsculas
+    assert echo_ratio("Canción", "cancion") == 1.0  # ignores accents and case
 
 
 def test_merger_orders_and_drops_echo():
@@ -21,7 +21,7 @@ def test_merger_orders_and_drops_echo():
     m.add(Line("mic", 10.0, 12.0, "hola qué tal"))
     m.add(Line("system", 5.0, 9.0, "bienvenidos a la clase de hoy"))
     m.add(Line("mic", 6.0, 8.5, "bienvenidos a la clase"))  # eco
-    m.flush(11.0)  # nada está a salvo todavía con el margen de eco
+    m.flush(11.0)  # nothing is safe yet within the echo margin
     assert [l.text for l in out] == []
     m.flush(100.0)
     assert [(l.source, l.text) for l in out] == [

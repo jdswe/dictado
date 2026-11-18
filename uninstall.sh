@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Desinstala Dictado. No borra tus dictados, transcripciones ni los modelos
-# descargados (~/.cache/huggingface).
+# Uninstall Dictado. Your dictations, transcripts and the downloaded models
+# (~/.cache/huggingface) are kept.
 set -uo pipefail
 PREFIX="${XDG_DATA_HOME:-$HOME/.local/share}"
 UUID="dictado@dictado.dev"
@@ -10,4 +10,4 @@ rm -f "$HOME/.config/systemd/user/dictado.service" "$PREFIX/dbus-1/services/dev.
 systemctl --user daemon-reload
 rm -rf "$PREFIX/gnome-shell/extensions/$UUID" "$PREFIX/dictado"
 rm -f "$HOME/.local/bin/dictado"
-echo "Dictado desinstalado. La configuración sigue en ~/.config/dictado."
+echo "Dictado uninstalled. Your settings remain in ~/.config/dictado."

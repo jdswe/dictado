@@ -1,11 +1,11 @@
-// Dictado — extensión de GNOME Shell.
+// Dictado — GNOME Shell extension.
 //
-// No contiene nada de audio ni de Whisper: habla con el servicio
-// `dev.dictado.Dictado` por D-Bus. Se encarga de lo que en Wayland solo puede
-// hacer el propio compositor:
-//   · el atajo global (mantener = hablar, toque = empezar/terminar),
-//   · escribir el texto donde está el cursor en cualquier app,
-//   · el indicador de grabación en la barra superior y la píldora flotante.
+// It contains no audio or Whisper code: it talks to the `dev.dictado.Dictado`
+// service over D-Bus. It does what only the compositor itself can do on
+// Wayland:
+//   · the global shortcut (hold = push to talk, tap = start/stop),
+//   · typing the text at the cursor in any app,
+//   · the recording indicator in the top bar and the floating pill.
 
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
@@ -52,6 +52,16 @@ const MODS = Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK |
     Clutter.ModifierType.MOD1_MASK;
 const BARS = 5;
 
+// '<Super><Shift>j' -> 'Super+Shift+J'
+function fmtAccel(accel) {
+    if (!accel)
+        return '';
+    const names = {Super: 'Super', Shift: 'Shift', Control: 'Ctrl', Ctrl: 'Ctrl', Primary: 'Ctrl', Alt: 'Alt'};
+    const mods = [...accel.matchAll(/<([^>]+)>/g)].map(m => names[m[1]] ?? m[1]);
+    const key = accel.replace(/<[^>]+>/g, '');
+    return [...mods, key.length === 1 ? key.toUpperCase() : key].join('+');
+}
+
 function fmtElapsed(ms) {
     const s = Math.max(0, Math.floor(ms / 1000));
     const h = Math.floor(s / 3600);
@@ -60,14 +70,14 @@ function fmtElapsed(ms) {
     return h ? `${h}:${m}:${ss}` : `${m}:${ss}`;
 }
 
-// Píldora flotante abajo al centro: «● Escuchando ▮▮▮» / «Transcribiendo…».
+// Floating pill at the bottom centre: "● Listening ▮▮▮" / "Transcribing…".
 const Pill = GObject.registerClass(
 class DictadoPill extends St.BoxLayout {
     _init() {
         super._init({style_class: 'dictado-pill', reactive: false, visible: false});
         this._dot = new St.Label({text: '●', style_class: 'dictado-pill-dot',
             y_align: Clutter.ActorAlign.CENTER});
-        this._label = new St.Label({text: 'Escuchando', style_class: 'dictado-pill-label',
+        this._label = new St.Label({text: 'Listening', style_class: 'dictado-pill-label',
             y_align: Clutter.ActorAlign.CENTER});
         this._bars = new St.BoxLayout({style_class: 'dictado-bars', y_align: Clutter.ActorAlign.CENTER});
         this._barActors = [];
@@ -86,11 +96,11 @@ class DictadoPill extends St.BoxLayout {
 
     showState(state) {
         if (state === 'recording') {
-            this._label.text = 'Escuchando';
+            this._label.text = 'Listening';
             this._dot.show();
             this.remove_style_class_name('dictado-pill-processing');
         } else if (state === 'processing') {
-            this._label.text = 'Transcribiendo…';
+            this._label.text = 'Transcribing…';
             this._dot.hide();
             this.add_style_class_name('dictado-pill-processing');
             this.setLevel(0.15);
@@ -137,14 +147,33 @@ class DictadoIndicator extends PanelMenu.Button {
         box.add_child(this._rec);
         this.add_child(box);
 
-        this._dictItem = this.menu.addAction('Dictar', () => ext.toggleDictation());
-        this._liveItem = this.menu.addAction('Iniciar transcripción (tú + sistema)',
-            () => ext.toggleTranscription());
-        this._fileItem = this.menu.addAction('Transcribir un archivo…', () => ext.spawn(['pick']));
+        this._dictItem = this._addItem('Dictate', () => ext.toggleDictation(), 'dictation-shortcut');
+        this._liveItem = this._addItem('Live Transcript', () => ext.toggleTranscription(),
+            'transcription-shortcut');
+        this._addItem('Transcribe File…', () => ext.spawn(['pick']));
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addAction('Abrir transcripciones', () => ext.openFolder('Transcripciones'));
-        this.menu.addAction('Abrir dictados', () => ext.openFolder('Dictados'));
-        this.menu.addAction('Preferencias', () => ext.openPreferences());
+        this._addItem('Open Transcripts', () => ext.openFolder('Transcripts'));
+        this._addItem('Open Dictations', () => ext.openFolder('Dictations'));
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        this._addItem('Settings…', () => ext.openPreferences());
+    }
+
+    // A menu row with an optional shortcut hint on the right, like macOS.
+    _addItem(text, callback, shortcutKey = null) {
+        const item = new PopupMenu.PopupMenuItem(text);
+        item.connect('activate', callback);
+        if (shortcutKey) {
+            const hint = new St.Label({style_class: 'dictado-shortcut-hint', x_expand: true,
+                x_align: Clutter.ActorAlign.END, y_align: Clutter.ActorAlign.CENTER});
+            item.add_child(hint);
+            const sync = () => {
+                hint.text = fmtAccel(this._ext._settings.get_strv(shortcutKey)[0]);
+            };
+            sync();
+            this._ext._settings.connectObject(`changed::${shortcutKey}`, sync, item);
+        }
+        this.menu.addMenuItem(item);
+        return item;
     }
 
     update(dictation, transcription, started) {
@@ -156,10 +185,10 @@ class DictadoIndicator extends PanelMenu.Button {
             this.add_style_class_name('dictado-indicator-recording');
         else
             this.remove_style_class_name('dictado-indicator-recording');
-        this._dictItem.label.text = dictation === 'recording' ? 'Terminar dictado'
-            : dictation === 'processing' ? 'Transcribiendo dictado…' : 'Dictar';
-        this._liveItem.label.text = live ? 'Detener transcripción'
-            : 'Iniciar transcripción (tú + sistema)';
+        this._dictItem.label.text = dictation === 'recording' ? 'Stop Dictation'
+            : dictation === 'processing' ? 'Transcribing…' : 'Dictate';
+        this._dictItem.setSensitive(dictation !== 'processing');
+        this._liveItem.label.text = live ? 'Stop Live Transcript' : 'Live Transcript';
         this._started = started;
         this._rec.visible = live;
         this._tick();
@@ -249,7 +278,7 @@ export default class DictadoExtension extends Extension {
         this._holdPoll = this._timer = this._restoreId = this._pasteId = 0;
     }
 
-    // -- estado ---------------------------------------------------------
+    // -- state ------------------------------------------------------------
     _syncFromProperties() {
         const d = this._proxy.Dictation ?? 'idle';
         const t = this._proxy.Transcription ?? 'idle';
@@ -269,17 +298,17 @@ export default class DictadoExtension extends Extension {
     }
 
     _call(method, ...args) {
-        // Las llamadas arrancan el servicio si no está en marcha (activación D-Bus).
+        // Calls start the service if it is not running (D-Bus activation).
         const run = proxy => proxy[`${method}Async`](...args).catch(e => {
             console.error(`Dictado ${method}: ${e.message}`);
-            Main.notifyError('Dictado', `No se pudo contactar con el servicio: ${e.message}`);
+            Main.notifyError('Dictado', `Could not reach the Dictado service: ${e.message}`);
         });
         if (this._proxy)
             return run(this._proxy);
         return Promise.resolve();
     }
 
-    // -- atajos ---------------------------------------------------------
+    // -- shortcuts --------------------------------------------------------
     toggleDictation() {
         if (this._dictation === 'recording')
             this._call('StopDictation');
@@ -301,8 +330,8 @@ export default class DictadoExtension extends Extension {
         if (this._dictation !== 'idle')
             return;
         this._startDictation();
-        // Si el atajo se mantiene pulsado, se para al soltarlo (pulsar para
-        // hablar). Si fue un toque corto, sigue grabando hasta el próximo toque.
+        // If the shortcut is held, recording stops on release (push to talk).
+        // After a quick tap it keeps recording until the next tap.
         this._pressedAt = GLib.get_monotonic_time();
         if (this._holdPoll)
             GLib.source_remove(this._holdPoll);
@@ -325,7 +354,7 @@ export default class DictadoExtension extends Extension {
             this._call('StartTranscription');
     }
 
-    // -- escribir el texto ----------------------------------------------
+    // -- typing the text ------------------------------------------------
     _insert(text) {
         if (!text)
             return;
@@ -333,8 +362,8 @@ export default class DictadoExtension extends Extension {
             text += ' ';
         const method = this._settings.get_string('insert-method');
         const im = Main.inputMethod;
-        // Apps con text-input (GTK, Qt, Firefox…): el texto entra por el
-        // método de entrada, sin tocar el portapapeles ni simular teclas.
+        // Apps with text-input (GTK, Qt, Firefox…): the text goes in through
+        // the input method, without touching the clipboard or faking keys.
         if (method === 'input-method' || (method === 'auto' && im?.currentFocus)) {
             im.commit(text);
             return;
@@ -343,9 +372,9 @@ export default class DictadoExtension extends Extension {
     }
 
     _paste(text) {
-        // Apps X11 (XWayland) o Electron/Chromium sin IME de Wayland:
-        // portapapeles + Ctrl+V (Ctrl+Shift+V en terminales) con un teclado
-        // virtual de Clutter, y luego se restaura el portapapeles.
+        // X11 (XWayland) apps, or Electron/Chromium without the Wayland IME:
+        // clipboard + Ctrl+V (Ctrl+Shift+V in terminals) through a Clutter
+        // virtual keyboard, then the clipboard is restored.
         const clipboard = St.Clipboard.get_default();
         clipboard.get_text(St.ClipboardType.CLIPBOARD, (_c, previous) => {
             clipboard.set_text(St.ClipboardType.CLIPBOARD, text);
@@ -376,7 +405,7 @@ export default class DictadoExtension extends Extension {
         [...keys].reverse().forEach(key => press(key, Clutter.KeyState.RELEASED));
     }
 
-    // -- utilidades del menú ---------------------------------------------
+    // -- menu helpers -----------------------------------------------------
     spawn(args) {
         const bin = GLib.find_program_in_path('dictado') ??
             GLib.build_filenamev([GLib.get_home_dir(), '.local', 'bin', 'dictado']);
@@ -388,7 +417,7 @@ export default class DictadoExtension extends Extension {
     }
 
     openFolder(name) {
-        // Mismas carpetas que los valores por defecto de ~/.config/dictado/config.toml
+        // Same folders as the defaults in ~/.config/dictado/config.toml
         const dir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_home_dir(), 'Documents', name]));
         try {
             dir.make_directory_with_parents(null);
