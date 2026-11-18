@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://api.github.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Dictado — habla y se escribe, en Linux</title>
+<meta name="description" content="Dictado por voz y transcripción locales con Whisper para Ubuntu con GNOME. Sin nube, sin cuenta.">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta property="og:title" content="Dictado — habla y se escribe, en Linux">
+<meta property="og:description" content="Pulsa un atajo, habla y el texto aparece donde está el cursor. Todo en tu equipo.">
+<style>
+:root {
+  --bg: #120f1d;
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.72);
+  --faint: rgba(255, 255, 255, 0.5);
+  --glass: rgba(255, 255, 255, 0.07);
+  --glass-strong: rgba(255, 255, 255, 0.12);
+  --border: rgba(255, 255, 255, 0.14);
+  --accent-a: #4f86ff;
+  --accent-b: #9b5cff;
+  --radius: 22px;
+  --max: 1080px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; color: var(--text); background: var(--bg);
+  font-family: "Inter", system-ui, sans-serif;
+  line-height: 1.55; -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: ""; position: fixed; inset: -20%; z-index: -1;
+  background:
+    radial-gradient(40% 35% at 20% 20%, rgba(255, 168, 110, 0.45), transparent 70%),
+    radial-gradient(45% 40% at 80% 25%, rgba(155, 92, 255, 0.45), transparent 70%),
+    radial-gradient(50% 45% at 50% 85%, rgba(79, 134, 255, 0.35), transparent 70%);
+  filter: blur(60px);
+}
+a { color: inherit; }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+h1, h2, h3 { font-family: "Inter", system-ui, sans-serif; letter-spacing: -0.02em; }
+h2 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 12px; }
+section { padding: 72px 0; }
+.lead { color: var(--muted); font-size: 18px; max-width: 640px; }
+
+/* barra de navegación */
+nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%); background: rgba(18, 15, 29, 0.55);
+  border-bottom: 1px solid var(--border); }
+nav .wrap { display: flex; align-items: center; gap: 24px; height: 56px; }
+nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; text-decoration: none; }
+nav .brand img { width: 28px; height: 28px; }
+nav .links { display: flex; gap: 20px; margin-left: auto; font-size: 14px; }
+nav .links a { color: var(--muted); text-decoration: none; }
+nav .links a:hover { color: var(--text); }
+@media (max-width: 760px) { nav .links a.optional { display: none; } }
+
+/* portada */
+.hero { text-align: center; padding: 96px 0 64px; }
+.hero img.icon { width: 132px; height: 132px; filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.45));
+  animation: float 4s ease-in-out infinite; }
+@keyframes float { 50% { transform: translateY(-10px); } }
+.hero h1 { font-size: clamp(56px, 10vw, 104px); margin: 18px 0 6px; line-height: 1; }
+.hero p { font-size: clamp(18px, 2.4vw, 22px); color: var(--muted); margin: 0 auto 28px; max-width: 620px; }
+.badge { display: inline-flex; gap: 8px; align-items: center; padding: 6px 14px; border-radius: 999px;
+  background: var(--glass); border: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+.badge b { color: var(--text); }
+.actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 28px 0 14px; }
+@media (max-width: 560px) { .btn { padding: 12px 20px; font-size: 15px; } .actions { gap: 10px; } }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 30px; border-radius: 999px;
+  font-weight: 700; font-size: 16px; text-decoration: none; border: 1px solid transparent;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease; }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+  box-shadow: 0 12px 34px rgba(110, 90, 255, 0.45); }
+.btn-primary:hover { box-shadow: 0 16px 44px rgba(110, 90, 255, 0.62); transform: translateY(-2px); }
+.btn-ghost { background: var(--glass); border-color: var(--border); }
+.btn-ghost:hover { background: var(--glass-strong); }
+.fine { color: var(--faint); font-size: 13px; }
+.hero .shot { margin: 48px auto 0; max-width: 920px; border-radius: 18px; overflow: hidden;
+  border: 1px solid var(--border); box-shadow: 0 40px 90px rgba(0, 0, 0, 0.5); }
+.hero .shot img, .hero .shot video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #000; }
+.demo-note { margin-top: 14px; }
+
+/* tarjetas */
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin-top: 28px; }
+.card { background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); transition: transform 180ms ease, background 180ms ease; }
+.card:hover { transform: translateY(-3px); background: var(--glass-strong); }
+.ic { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center;
+  background: linear-gradient(135deg, rgba(79, 134, 255, 0.95), rgba(155, 92, 255, 0.95));
+  box-shadow: 0 8px 22px rgba(110, 90, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.ic svg { width: 24px; height: 24px; fill: none; stroke: #ffffff; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round; }
+.ic-sm { width: 30px; height: 30px; border-radius: 9px; flex: none; }
+.ic-sm svg { width: 17px; height: 17px; }
+.app-kind { display: inline-flex; align-items: center; gap: 12px; }
+.card h3 { margin: 10px 0 6px; font-size: 18px; }
+.card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* instalación */
+.code { position: relative; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border); border-radius: 16px;
+  padding: 18px 64px 18px 20px; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 15px;
+  overflow-x: auto; white-space: nowrap; }
+.code button { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: 1px solid var(--border);
+  background: var(--glass-strong); color: var(--text); border-radius: 10px; padding: 6px 12px; cursor: pointer; font: inherit; font-size: 13px; }
+@media (max-width: 600px) {
+  .code { white-space: normal; word-break: break-all; padding-right: 20px; }
+  .code button { position: static; transform: none; display: block; margin-top: 12px; }
+}
+.steps { counter-reset: step; display: grid; gap: 14px; margin-top: 18px; }
+.steps li { list-style: none; counter-increment: step; position: relative; padding-left: 46px; color: var(--muted); }
+.steps li::before { content: counter(step); position: absolute; left: 0; top: -2px; width: 30px; height: 30px;
+  border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: var(--text);
+  background: linear-gradient(135deg, var(--accent-a), var(--accent-b)); }
+.two { display: grid; gap: 24px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+
+/* capturas */
+.gallery { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 28px; }
+.gallery figure { margin: 0; background: var(--glass); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.gallery img { display: block; width: 100%; aspect-ratio: 16 / 11; object-fit: cover; object-position: top; }
+.gallery figcaption { padding: 10px 14px; color: var(--muted); font-size: 14px; }
+
+/* tabla */
+table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 24px; overflow: hidden;
+  border: 1px solid var(--border); border-radius: 18px; background: var(--glass); }
+th, td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
+.yes { color: #6ee7a8; font-weight: 700; } .part { color: #ffd479; font-weight: 700; } .no { color: #ff8a8a; font-weight: 700; }
+
+/* versiones */
+.release { padding: 18px 22px; min-width: 0; overflow-wrap: anywhere; }
+.release header { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.release h3 { margin: 0; }
+.release time { color: var(--faint); font-size: 13px; }
+.release ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); }
+.release code { font-family: "JetBrains Mono", ui-monospace, monospace; background: rgba(0, 0, 0, 0.3); padding: 1px 6px; border-radius: 6px; }
+.release .latest { font-size: 12px; padding: 3px 10px; border-radius: 999px; margin-left: 8px;
+  background: linear-gradient(135deg, var(--accent-a), var(--accent-b)); vertical-align: middle; }
+
+/* preguntas */
+details { background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 16px 20px; margin-top: 12px; }
+summary { cursor: pointer; font-weight: 600; }
+details p { color: var(--muted); margin: 10px 0 0; }
+
+.gl { width: 18px; height: 18px; flex: none; }
+nav .with-icon { display: inline-flex; align-items: center; gap: 6px; }
+footer { padding: 56px 0 48px; color: var(--faint); font-size: 14px; border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.03)); }
+footer a { color: var(--muted); text-decoration: none; transition: color 160ms ease; }
+footer a:hover { color: var(--text); }
+.foot-grid { display: grid; grid-template-columns: minmax(220px, 1.6fr) repeat(3, minmax(120px, 1fr)); gap: 32px; }
+.foot-brand .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--text); }
+.foot-brand .brand img { width: 28px; height: 28px; }
+.foot-brand p { margin: 12px 0 16px; max-width: 34ch; color: var(--muted); }
+.foot-source { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
+  background: var(--glass); border: 1px solid var(--border); }
+.foot-source:hover { background: var(--glass-strong); }
+.foot-col { display: flex; flex-direction: column; gap: 10px; }
+.foot-col h4 { margin: 0 0 4px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+.foot-bottom { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; margin-top: 40px;
+  padding-top: 20px; border-top: 1px solid var(--border); }
+.foot-note { margin: 12px 0 0; font-size: 13px; }
+.foot-note a { text-decoration: underline; }
+.privacy-more { color: var(--muted); margin-top: 20px; }
+@media (max-width: 720px) { .foot-grid { grid-template-columns: 1fr 1fr; } .foot-brand { grid-column: 1 / -1; } }
+
+/* Dictado */
+.demo { margin: 48px auto 0; max-width: 760px; text-align: left; background: var(--glass); border: 1px solid var(--border);
+  border-radius: 18px; padding: 18px 22px 26px; box-shadow: 0 40px 90px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+.demo .bar { display: flex; gap: 7px; margin-bottom: 16px; }
+.demo .bar i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+.demo .bar i:nth-child(1) { background: #ff5f57; } .demo .bar i:nth-child(2) { background: #febc2e; } .demo .bar i:nth-child(3) { background: #28c840; }
+.demo .editor { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 15px; color: var(--faint); min-height: 72px; }
+.demo .editor b { color: var(--text); font-weight: 500; }
+.caret { display: inline-block; width: 2px; height: 1.15em; background: var(--accent-b); vertical-align: text-bottom; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.pill { margin: 18px auto 0; width: max-content; max-width: 100%; display: flex; align-items: center; gap: 10px;
+  background: #1c1c1e; border: 1px solid #3a3a3c; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; }
+.pill .dot { color: #ff453a; }
+.wave { display: flex; gap: 3px; align-items: center; height: 22px; }
+.wave i { width: 4px; border-radius: 2px; background: #ff453a; display: block; animation: wave 1.1s ease-in-out infinite; }
+.wave i:nth-child(2) { animation-delay: .15s } .wave i:nth-child(3) { animation-delay: .3s }
+.wave i:nth-child(4) { animation-delay: .45s } .wave i:nth-child(5) { animation-delay: .6s }
+@keyframes wave { 0%, 100% { height: 5px; } 50% { height: 20px; } }
+@media (prefers-reduced-motion: reduce) { .wave i, .caret, .hero img.icon { animation: none; } .wave i { height: 12px; } }
+kbd { font-family: inherit; font-size: 0.92em; background: var(--glass-strong); border: 1px solid var(--border);
+  border-bottom-width: 2px; border-radius: 7px; padding: 1px 8px; color: var(--text); }
+.keys { margin-top: 12px; color: var(--faint); font-size: 14px; }
+.transcript { background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px;
+  font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+.transcript .t { color: var(--faint); } .transcript .yo { color: #7cc4ff; font-weight: 700; } .transcript .otros { color: #ffb27a; font-weight: 700; }
+code { font-family: "JetBrains Mono", ui-monospace, monospace; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#"><img src="icon.svg" alt="">Dictado</a>
+    <div class="links">
+      <a href="#features" class="optional">Funciones</a>
+      <a href="#install">Instalar</a>
+      <a href="#how" class="optional">Cómo funciona</a>
+      <a href="#releases" class="optional">Versiones</a>
+      <a href="#privacy" class="optional">Privacidad</a>
+      <a href="https://github.com/jdswe/dictado" class="with-icon"><svg class="gl" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    </div>
+  </div>
+</nav>
+<header class="hero wrap">
+  <img class="icon" src="icon.svg" alt="Icono de Dictado">
+  <h1>Dictado</h1>
+  <p>Habla y el texto aparece donde está el cursor, en cualquier app de Ubuntu. Whisper en tu propio equipo: sin nube y sin cuenta.</p>
+  <span class="badge">Última versión <b id="version">…</b> <span id="released"></span></span>
+  <div class="actions">
+    <a class="btn btn-primary" href="#install"><svg class="gl" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 4 4-4 4"/><path d="M12 17h7"/></svg>Instalar con un comando</a>
+    <a class="btn btn-ghost" href="https://github.com/jdswe/dictado/releases/latest"><svg class="gl" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Descargar</a>
+    <a class="btn btn-ghost" href="https://github.com/jdswe/dictado"><svg class="gl" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Código</a>
+  </div>
+  <div class="fine">Ubuntu con GNOME 48–50 en Wayland · español e inglés · software libre (MIT)</div>
+  <div class="demo" aria-label="Ejemplo: dictando en un editor">
+    <div class="bar"><i></i><i></i><i></i></div>
+    <div class="editor">// TODO<br><b>Mañana reviso el formulario de registro y subo los cambios.</b><span class="caret"></span></div>
+    <div class="pill"><span class="dot">●</span> Escuchando <span class="wave"><i></i><i></i><i></i><i></i><i></i></span></div>
+  </div>
+  <div class="fine demo-note">Mantén <kbd>Super</kbd> + <kbd>J</kbd>, habla y suelta.</div>
+</header>
+<main>
+<section id="features">
+  <div class="wrap">
+    <h2>Tu voz, escrita</h2>
+    <p class="lead">Una extensión de GNOME pone el atajo y escribe el texto; un servicio en segundo plano se encarga del audio y de Whisper.</p>
+    <div class="grid">
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg></span><h3>Dictado</h3><p>Mantén el atajo mientras hablas y suelta: el texto se escribe en VS Code, el navegador, la terminal o cualquier documento.</p><p class="keys"><kbd>Super</kbd> + <kbd>J</kbd> · un toque corto = manos libres</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12h2M6 8v8M10 5v14M14 9v6M18 7v10M22 12h-2"/></svg></span><h3>Transcripción en vivo</h3><p>Reuniones, clases o vídeos: graba a la vez tu micrófono y el audio del equipo y escribe un .txt con «Yo» y «Otros».</p><p class="keys"><kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd></p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><h3>Archivos</h3><p>Convierte un audio o un vídeo en un .txt junto al original, con la hora de cada frase.</p><p class="keys"><code>dictado transcribe clase.mp4</code></p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><h3>Español e inglés</h3><p>Detecta solo el idioma de cada frase, con tildes, ñ y signos de puntuación.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></span><h3>Sin eco</h3><p>Con altavoces, el micrófono también oye a los demás: Dictado reconoce ese eco y no lo apunta dos veces.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></span><h3>API D-Bus</h3><p>Otras extensiones pueden añadir un botón de micrófono o mostrar el nivel de tu voz sin incluir nada de audio ni de Whisper.</p></div>
+    </div>
+  </div>
+</section>
+<section id="install">
+  <div class="wrap">
+    <h2>Instalar</h2>
+    <p class="lead">Un comando descarga la última versión y la instala para tu usuario. No usa sudo.</p>
+    <div class="code"><span id="cmd">curl -fsSL https://jdswe.github.io/dictado/install.sh | bash</span><button type="button" data-copy="cmd">Copiar</button></div>
+    <div class="two" style="margin-top:32px">
+      <div class="card">
+        <h3>Antes, una vez</h3>
+        <ol class="steps">
+          <li>Si Ubuntu no tiene <code>python3-venv</code>: <code>sudo apt install python3-venv ffmpeg</code></li>
+          <li>Ejecuta el comando de arriba. Descarga los modelos una sola vez (unos 350 MB).</li>
+          <li><b>Cierra sesión y vuelve a entrar</b>: verás un micrófono en la barra superior.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>Desde el código</h3>
+        <ol class="steps">
+          <li><code>git clone https://github.com/jdswe/dictado.git</code></li>
+          <li><code>cd dictado &amp;&amp; ./install.sh</code></li>
+          <li>Para quitarlo: <code>./uninstall.sh</code> (tus textos se quedan).</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="how">
+  <div class="wrap two">
+    <div>
+      <h2>Sabe quién habla</h2>
+      <p class="lead">No adivina voces: lo que entra por tu micrófono eres tú y lo que suena en el equipo son los demás. Cada línea se guarda en disco en cuanto se transcribe, así que aunque algo se cierre no se pierde nada.</p>
+      <p class="lead">Mientras graba, la barra superior muestra un <b style="color:#ff453a">REC</b> rojo con el tiempo.</p>
+    </div>
+    <pre class="transcript"><span class="t"># Transcripción 2026-11-18 14:03</span>
+
+<span class="t">[14:03:15]</span> <span class="otros">Otros:</span> Bueno, empecemos con la revisión.
+<span class="t">[14:03:21]</span> <span class="yo">Yo:</span> Vale, yo terminé el formulario.
+<span class="t">[14:03:27]</span> <span class="otros">Otros:</span> Perfecto, ¿y las pruebas?</pre>
+  </div>
+</section>
+<section id="speed">
+  <div class="wrap">
+    <h2>Rápido sin tarjeta gráfica</h2>
+    <p class="lead">faster-whisper en el procesador, medido en un portátil con AMD Ryzen 5 7520U.</p>
+    <table>
+      <tr><th>Modelo</th><th>60 s de voz</th><th>Se usa para</th></tr>
+      <tr><td>small</td><td>~29 s</td><td>Dictado y archivos. Un dictado corto tarda unos 3–5 s.</td></tr>
+      <tr><td>base</td><td>~10 s</td><td>Transcripción en vivo, a tiempo real con dos fuentes.</td></tr>
+      <tr><td>tiny</td><td>~3 s</td><td>Solo detectar el idioma.</td></tr>
+    </table>
+  </div>
+</section>
+<section id="releases">
+  <div class="wrap">
+    <h2>Novedades</h2>
+    <p class="lead">Leídas en directo de GitHub Releases.</p>
+    <div id="release-list" class="grid" style="grid-template-columns:1fr"><div class="card">Cargando versiones…</div></div>
+  </div>
+</section>
+<section id="faq">
+  <div class="wrap">
+    <h2>Preguntas</h2>
+    <details><summary>¿Por qué una extensión de GNOME?</summary><p>En Wayland una app normal no puede escribir en otra. La extensión corre dentro de GNOME: entrega el texto por el método de entrada (como el teclado en pantalla) y, si la app no lo admite, lo pega con el portapapeles y lo restaura después. Sin root, sin <code>/dev/uinput</code> y sin diálogos de permiso.</p></details>
+    <details><summary>Pulso Super+J y solo se escribe una «j»</summary><p>GNOME aún no ha cargado la extensión: cierra sesión y vuelve a entrar una vez después de instalar.</p></details>
+    <details><summary>¿Puedo cambiar el atajo?</summary><p>Sí, en Extensiones → Dictado → Configuración. Super+H se deja para minimizar ventanas, como en GNOME.</p></details>
+    <details><summary>¿Va más rápido?</summary><p>En <code>~/.config/dictado/config.toml</code> pon <code>dictation_model = "base"</code> (algo menos preciso) o, si solo hablas un idioma, <code>languages = ["es"]</code>.</p></details>
+    <details><summary>¿Funciona con Macify?</summary><p>Son proyectos separados. Macify podrá añadir un botón de micrófono que hable con Dictado por D-Bus.</p></details>
+  </div>
+</section>
+<section id="privacy">
+  <div class="wrap">
+    <h2>Privacidad</h2>
+    <p class="lead">Tu voz no sale de tu equipo.</p>
+    <div class="grid">
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><h3>Todo local</h3><p>El audio se procesa en tu equipo y no se guarda: solo el texto. Sin cuenta, sin analíticas y sin servidor.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4" fill="#fff" stroke="none"/></svg></span><h3>Consentimiento</h3><p>La transcripción en vivo graba a otras personas. Avísales y pide permiso: en muchos lugares es obligatorio.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span><h3>Una descarga</h3><p>Solo se conecta a internet para bajar los modelos de Whisper (Hugging Face), una vez.</p></div>
+      <div class="card"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg></span><h3>Esta web</h3><p>No usa cookies ni guarda nada en tu navegador. Lee la lista de versiones de la API pública de GitHub.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#"><img src="icon.svg" alt="">Dictado</a>
+        <p>Dictado por voz y transcripción locales para Ubuntu con GNOME. Software libre.</p>
+        <a class="foot-source" href="https://github.com/jdswe/dictado"><svg class="gl" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Código en GitHub</a>
+      </div>
+      <div class="foot-col">
+        <h4>Producto</h4>
+        <a href="#features">Funciones</a>
+        <a href="#install">Instalar</a>
+        <a href="#releases">Versiones</a>
+      </div>
+      <div class="foot-col">
+        <h4>Ayuda</h4>
+        <a href="https://github.com/jdswe/dictado#readme">Guía</a>
+        <a href="#faq">Preguntas</a>
+        <a href="https://github.com/jdswe/dictado/issues/new">Informar de un problema</a>
+      </div>
+      <div class="foot-col">
+        <h4>Proyectos</h4>
+        <a href="https://jdswe.github.io/macify/">Macify</a>
+        <a href="https://github.com/jdswe/dictado/blob/main/LICENSE">Licencia (MIT)</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Jose David Carranza Angarita. Dictado es software libre bajo licencia MIT.</span>
+      <span>Sin cookies · Sin rastreo · Sin cuenta</span>
+    </div>
+    <p class="foot-note">Usa <a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper</a> y los modelos
+      <a href="https://github.com/openai/whisper">Whisper</a> de OpenAI, cada uno con su licencia.</p>
+  </div>
+</footer>
+<script>
+const REPO = "jdswe/dictado";
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// Markdown mínimo para las notas de versión: listas, negrita, código y bloques de código.
+function renderNotes(markdown) {
+  const out = [];
+  let inList = false, inCode = false;
+  for (const raw of (markdown || "").split("\n")) {
+    if (raw.trim().startsWith("```")) { inCode = !inCode; continue; }
+    if (inCode) { out.push(`<p><code>${escapeHtml(raw)}</code></p>`); continue; }
+    let line = escapeHtml(raw.trim())
+      .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+      .replace(/`(.+?)`/g, "<code>$1</code>");
+    if (/^[-*] /.test(raw.trim())) {
+      if (!inList) { out.push("<ul>"); inList = true; }
+      out.push(`<li>${line.slice(2)}</li>`);
+    } else {
+      if (inList) { out.push("</ul>"); inList = false; }
+      if (line && !line.startsWith("|")) out.push(`<p>${line}</p>`);
+    }
+  }
+  if (inList) out.push("</ul>");
+  return out.join("");
+}
+
+async function loadReleases() {
+  const list = document.getElementById("release-list");
+  try {
+    const response = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=6`);
+    const releases = (await response.json()).filter(r => !r.draft && !r.prerelease);
+    if (!releases.length) throw new Error("no releases");
+    const latest = releases[0];
+    document.getElementById("version").textContent = latest.tag_name;
+    document.getElementById("released").textContent =
+      "· " + new Date(latest.published_at).toLocaleDateString("es", { year: "numeric", month: "short", day: "numeric" });
+    list.innerHTML = releases.map((r, i) => `
+      <article class="card release">
+        <header><h3>${escapeHtml(r.name || r.tag_name)}${i === 0 ? '<span class="latest">Última</span>' : ""}</h3>
+        <time>${new Date(r.published_at).toLocaleDateString("es")}</time></header>
+        ${renderNotes(r.body)}
+      </article>`).join("");
+  } catch (error) {
+    document.getElementById("version").textContent = "en GitHub";
+    list.innerHTML = '<div class="card">Todas las versiones en <a href="https://github.com/jdswe/dictado/releases">GitHub Releases</a>.</div>';
+  }
+}
+
+document.querySelectorAll("[data-copy]").forEach(button => {
+  button.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(document.getElementById(button.dataset.copy).textContent);
+    button.textContent = "Copiado";
+    setTimeout(() => (button.textContent = "Copiar"), 1600);
+  });
+});
+
+loadReleases();
+</script>
+</body>
+</html>

@@ -1,5 +1,7 @@
 # Dictado
 
+**Web:** https://jdswe.github.io/dictado/
+
 Dictado por voz y transcripción **locales** para Linux (GNOME en Wayland), al
 estilo de Wispr Flow. Usa Whisper en tu CPU: sin nube, sin cuenta, nada sale
 de tu equipo.
@@ -73,9 +75,9 @@ personas, **avísales y pide su consentimiento**.
 # Transcripción 2026-11-18 14:03
 # Yo = micrófono · Otros = audio del sistema
 
-[14:03:15] Otros: Bueno, empecemos con la revisión del sprint.
-[14:03:21] Yo: Vale, yo terminé la validación de la placa.
-[14:03:27] Otros: Perfecto, ¿y los duplicados?
+[14:03:15] Otros: Bueno, empecemos con la revisión de la semana.
+[14:03:21] Yo: Vale, yo terminé el formulario de registro.
+[14:03:27] Otros: Perfecto, ¿y las pruebas?
 ```
 
 - Archivos: `video.mp4` → `video.txt` (o `video (2).txt` si ya existe), con
