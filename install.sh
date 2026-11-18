@@ -61,17 +61,9 @@ cp -r "$REPO/extension/$UUID/." "$EXT_DIR/"
 glib-compile-schemas "$EXT_DIR/schemas"
 gnome-extensions enable "$UUID" 2>/dev/null || true
 
-# 6. Super+H es «minimizar ventana» en GNOME por defecto
-if gsettings get org.gnome.desktop.wm.keybindings minimize | grep -q "<Super>h"; then
-    echo
-    echo "GNOME usa Super+H para minimizar ventanas, el mismo atajo del dictado."
-    read -r -p "¿Quitar Super+H de «minimizar» para usarlo en Dictado? [S/n] " ans
-    if [[ ! "$ans" =~ ^[nN] ]]; then
-        gsettings set org.gnome.desktop.wm.keybindings minimize "[]"
-        echo "Hecho (para deshacer: gsettings reset org.gnome.desktop.wm.keybindings minimize)"
-    else
-        echo "Cambia el atajo en las preferencias de la extensión Dictado."
-    fi
+# 6. Avisar si el atajo choca con otro de GNOME (no se cambia nada)
+if gsettings list-recursively 2>/dev/null | grep -qiF "'<Super>j'"; then
+    echo "Aviso: Super+J ya lo usa otro atajo de GNOME. Cámbialo en las preferencias de la extensión Dictado."
 fi
 
 # 7. Modelos (se descargan una sola vez a ~/.cache/huggingface)
@@ -84,4 +76,4 @@ if ! gnome-extensions info "$UUID" 2>/dev/null | grep -qi "ACTIVE\|Activ"; then
     echo "  Cierra sesión y vuelve a entrar para que GNOME cargue la extensión."
     echo "  Después: gnome-extensions enable $UUID"
 fi
-echo "  Dictar: Super+H · Transcripción en vivo: Super+Shift+H · Archivos: dictado transcribe ARCHIVO"
+echo "  Dictar: Super+J · Transcripción en vivo: Super+Shift+J · Archivos: dictado transcribe ARCHIVO"

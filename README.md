@@ -4,9 +4,9 @@ Dictado por voz y transcripción **locales** para Linux (GNOME en Wayland), al
 estilo de Wispr Flow. Usa Whisper en tu CPU: sin nube, sin cuenta, nada sale
 de tu equipo.
 
-- **Dictado** (solo micrófono): pulsa **Super+H**, habla, y el texto aparece
+- **Dictado** (solo micrófono): pulsa **Super+J**, habla, y el texto aparece
   donde está el cursor, en cualquier app (VS Code, el navegador, la terminal…).
-- **Transcripción en vivo** (lo que oyes + lo que dices): **Super+Shift+H**
+- **Transcripción en vivo** (lo que oyes + lo que dices): **Super+Shift+J**
   graba a la vez el audio del sistema (reuniones, vídeos, clases) y tu
   micrófono, y escribe un `.txt` con líneas `Yo:` y `Otros:` por orden de hora.
 - **Archivos**: transcribe un audio o vídeo a un `.txt` junto a él.
@@ -38,8 +38,8 @@ El instalador, sin sudo:
    [faster-whisper](https://github.com/SYSTRAN/faster-whisper);
 2. instala el servicio (`dictado.service` de systemd + activación D-Bus);
 3. instala y activa la extensión de GNOME Shell `dictado@dictado.dev`;
-4. te pregunta si quitar **Super+H** de «minimizar ventana» (GNOME lo usa
-   por defecto) para usarlo en el dictado;
+4. avisa si **Super+J** choca con otro atajo (no toca los atajos de GNOME;
+   Super+H sigue siendo «minimizar»);
 5. descarga los modelos una sola vez (`~/.cache/huggingface`, ~350 MB).
 
 En Wayland, GNOME solo carga extensiones nuevas al iniciar sesión: **cierra
@@ -51,9 +51,9 @@ sesión y vuelve a entrar** la primera vez.
 
 | Acción | Cómo |
 |---|---|
-| Dictar (pulsar para hablar) | Mantén **Super+H** mientras hablas; al soltar se escribe el texto |
-| Dictar (manos libres) | Toque corto en **Super+H** para empezar, otro para terminar |
-| Transcripción en vivo | **Super+Shift+H** para empezar y para terminar |
+| Dictar (pulsar para hablar) | Mantén **Super+J** mientras hablas; al soltar se escribe el texto |
+| Dictar (manos libres) | Toque corto en **Super+J** para empezar, otro para terminar |
+| Transcripción en vivo | **Super+Shift+J** para empezar y para terminar |
 | Transcribir un archivo | `dictado transcribe video.mp4` o el menú del icono → «Transcribir un archivo…» |
 
 Mientras dictas aparece una píldora abajo («● Escuchando» con el nivel del
@@ -114,7 +114,7 @@ portapapeles) están en *Extensiones → Dictado → Configuración*.
 ## Cómo funciona
 
 ```
- Super+H ─► extensión de GNOME Shell ──D-Bus──► servicio (Python)
+ Super+J ─► extensión de GNOME Shell ──D-Bus──► servicio (Python)
                  ▲                                  │ pw-record (PipeWire)
                  │ DictationText                    │ faster-whisper (CPU, int8)
                  └──────────────────────────────────┘

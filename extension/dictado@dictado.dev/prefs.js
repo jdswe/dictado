@@ -18,7 +18,7 @@ export default class DictadoPrefs extends ExtensionPreferences {
 
         const keys = new Adw.PreferencesGroup({
             title: 'Atajos',
-            description: 'Formato GTK, p. ej. <Super>h o <Ctrl><Alt>space. ' +
+            description: 'Formato GTK, p. ej. <Super>j o <Ctrl><Alt>space. ' +
                 'Mantener el atajo = hablar mientras se mantiene; toque corto = empezar/terminar.',
         });
         page.add(keys);
