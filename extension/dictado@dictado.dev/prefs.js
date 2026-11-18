@@ -18,7 +18,7 @@ export default class DictadoPrefs extends ExtensionPreferences {
 
         const keys = new Adw.PreferencesGroup({
             title: 'Shortcuts',
-            description: 'GTK format, e.g. <Super>j or <Ctrl><Alt>space. ' +
+            description: 'GTK format, e.g. &lt;Super&gt;j or &lt;Ctrl&gt;&lt;Alt&gt;space. ' +
                 'Hold to talk, or tap to start and tap again to stop.',
         });
         page.add(keys);

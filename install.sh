@@ -64,10 +64,14 @@ systemctl --user daemon-reload
 systemctl --user enable dictado.service >/dev/null 2>&1 || true
 systemctl --user restart dictado.service || true
 
-# Desktop entry: gives notifications Dictado's name and icon.
-mkdir -p "$PREFIX/applications"
-sed "s|^Exec=dictado|Exec=$VENV/bin/dictado|" "$REPO/data/dev.dictado.Dictado.desktop" \
-    > "$PREFIX/applications/dev.dictado.Dictado.desktop"
+# App icon and desktop entry: Dictado Settings and notifications get
+# Dictado's own name and icon (in the dock and the app grid).
+mkdir -p "$PREFIX/applications" "$PREFIX/icons/hicolor/scalable/apps"
+cp "$REPO/data/dev.dictado.Dictado.svg" "$PREFIX/icons/hicolor/scalable/apps/dev.dictado.Dictado.svg"
+gtk-update-icon-cache -q -t -f "$PREFIX/icons/hicolor" 2>/dev/null || true
+sed "s|^Exec=dictado|Exec=$VENV/bin/dictado|" "$REPO/data/dev.dictado.App.desktop" \
+    > "$PREFIX/applications/dev.dictado.App.desktop"
+rm -f "$PREFIX/applications/dev.dictado.Dictado.desktop"  # name used by 0.2.1
 
 # 5. GNOME Shell extension
 say "Installing the GNOME Shell extension"

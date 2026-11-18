@@ -155,7 +155,7 @@ class DictadoIndicator extends PanelMenu.Button {
         this._addItem('Open Transcripts', () => ext.openFolder('Transcripts'));
         this._addItem('Open Dictations', () => ext.openFolder('Dictations'));
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this._addItem('Settings…', () => ext.openPreferences());
+        this._addItem('Settings…', () => ext.spawn(['settings']));
     }
 
     // A menu row with an optional shortcut hint on the right, like macOS.

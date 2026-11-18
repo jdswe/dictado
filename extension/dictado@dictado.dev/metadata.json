@@ -5,5 +5,5 @@
   "shell-version": ["48", "49", "50"],
   "settings-schema": "org.gnome.shell.extensions.dictado",
   "gettext-domain": "dictado",
-  "version-name": "0.2.1"
+  "version-name": "0.2.2"
 }

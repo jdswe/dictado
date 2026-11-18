@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2 — 2026-11-18
+
+- **Dictado has its own app.** Settings… in the top bar menu (and *Dictado* in the app grid) opens Dictado Settings with Dictado's own icon and name in the dock, instead of GNOME's Extensions app. Besides shortcuts and typing, it sets the dictation model, the languages and whether dictations are kept, and has shortcuts to the saved text folders.
+- Fixed the shortcut format hint, which did not show in the settings.
+
 ## 0.2.1 — 2026-11-18
 
 - Notifications for saved transcripts and transcribed files now preview the first lines of text. Click one (in the banner or in the notification list) to open the file, or use **Show in Folder**. They appear under Dictado's own name and icon.

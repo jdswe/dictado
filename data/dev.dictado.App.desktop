@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Dictado
+GenericName=Voice Dictation
+Comment=Local voice dictation and transcription
+Icon=dev.dictado.Dictado
+Exec=dictado settings
+StartupWMClass=dev.dictado.App
+StartupNotify=true
+Categories=Utility;
+Keywords=dictation;speech;voice;transcription;whisper;

@@ -6,7 +6,7 @@ PREFIX="${XDG_DATA_HOME:-$HOME/.local/share}"
 UUID="dictado@dictado.dev"
 gnome-extensions disable "$UUID" 2>/dev/null
 systemctl --user disable --now dictado.service 2>/dev/null
-rm -f "$PREFIX/applications/dev.dictado.Dictado.desktop" "$HOME/.config/systemd/user/dictado.service" "$PREFIX/dbus-1/services/dev.dictado.Dictado.service"
+rm -f "$PREFIX/icons/hicolor/scalable/apps/dev.dictado.Dictado.svg" "$PREFIX/applications/dev.dictado.App.desktop" "$HOME/.config/systemd/user/dictado.service" "$PREFIX/dbus-1/services/dev.dictado.Dictado.service"
 systemctl --user daemon-reload
 rm -rf "$PREFIX/gnome-shell/extensions/$UUID" "$PREFIX/dictado"
 rm -f "$HOME/.local/bin/dictado"

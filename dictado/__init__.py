@@ -1,6 +1,6 @@
 """Dictado: local voice dictation and transcription for GNOME (Wayland)."""
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 BUS_NAME = "dev.dictado.Dictado"
 OBJECT_PATH = "/dev/dictado/Dictado"

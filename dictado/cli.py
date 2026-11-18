@@ -143,6 +143,7 @@ def main(argv=None) -> int:
     sub.add_parser("status", help="service status")
     sub.add_parser("watch", help="print D-Bus signals")
     sub.add_parser("download", help="download the configured models")
+    sub.add_parser("settings", help="open Dictado Settings")
     sub.add_parser("pick", help="choose files and transcribe them in the background")
     sub.add_parser("quit", help="stop the service")
     t = sub.add_parser("transcribe", help="transcribe audio or video files to .txt")
@@ -164,6 +165,9 @@ def main(argv=None) -> int:
         return cmd_watch(ns)
     if ns.cmd == "download":
         return cmd_download(ns)
+    if ns.cmd == "settings":
+        from dictado.settings_app import main as settings_main
+        return settings_main()
     if ns.cmd == "pick":
         return cmd_pick(ns)
     simple = {"toggle": "Toggle", "start": "StartDictation", "stop": "StopDictation",

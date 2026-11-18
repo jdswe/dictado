@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 NAME = "org.freedesktop.Notifications"
 PATH = "/org/freedesktop/Notifications"
-DESKTOP_ID = "dev.dictado.Dictado"
+DESKTOP_ID = "dev.dictado.App"
 
 
 def preview(path: Path, lines: int = 3, limit: int = 220) -> str:

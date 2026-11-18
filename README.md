@@ -112,8 +112,10 @@ After editing it: `systemctl --user restart dictado`.
 | `mic_label` / `system_label` | `Me` / `Others` | Labels in live transcripts |
 | `echo_filter` | `true` | Drop speaker echo (see below) |
 
-The extension's settings (shortcuts, how text is inserted, clipboard restore)
-are in *Extensions → Dictado → Settings*.
+Most of these can also be changed in **Dictado Settings** (top bar menu →
+Settings…, or *Dictado* in the app grid): shortcuts, how text is inserted,
+clipboard restore, dictation model, languages and whether dictations are kept.
+It restarts the service for you.
 
 ## How it works
 
