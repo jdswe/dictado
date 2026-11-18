@@ -1,8 +1,8 @@
-"""Captura de audio desde PipeWire con pw-record (sin dependencias extra).
+"""Audio capture from PipeWire with pw-record (no extra dependencies).
 
-- Micrófono: el source predeterminado (o el nodo indicado).
-- Sistema: el monitor del sink predeterminado (stream.capture.sink=true),
-  es decir, lo que suena por los altavoces o auriculares.
+- Microphone: the default source (or the given node).
+- System: the monitor of the default sink (stream.capture.sink=true), that is,
+  whatever plays through the speakers or headphones.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ RATE = 16000
 BLOCK_SECONDS = 0.1
 BLOCK_BYTES = int(RATE * BLOCK_SECONDS) * 2  # s16 mono
 
-# callback(bloque_float32, hora_unix_del_inicio_del_bloque)
+# callback(float32_block, unix_time_of_block_start)
 BlockCallback = Callable[[np.ndarray, float], None]
 
 
@@ -27,13 +27,13 @@ def pcm16_to_float(data: bytes) -> np.ndarray:
 
 
 def decode_file(path: str) -> np.ndarray:
-    """Decodifica cualquier audio o vídeo a 16 kHz mono con ffmpeg."""
+    """Decode any audio or video file to 16 kHz mono with ffmpeg."""
     proc = subprocess.run(
         ["ffmpeg", "-nostdin", "-loglevel", "error", "-i", str(path), "-vn", "-ac", "1",
          "-ar", str(RATE), "-f", "s16le", "-"],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     if proc.returncode != 0:
-        raise RuntimeError(proc.stderr.decode(errors="replace").strip() or "ffmpeg falló")
+        raise RuntimeError(proc.stderr.decode(errors="replace").strip() or "ffmpeg failed")
     return pcm16_to_float(proc.stdout)
 
 
@@ -44,7 +44,7 @@ def rms(block: np.ndarray) -> float:
 
 
 class Capture:
-    """Un proceso pw-record que entrega bloques de 100 ms a un callback."""
+    """A pw-record process that delivers 100 ms blocks to a callback."""
 
     def __init__(self, kind: str, callback: BlockCallback, target: str = "", name: str = "Dictado"):
         if kind not in ("mic", "system"):
@@ -60,7 +60,7 @@ class Capture:
     def command(self) -> list[str]:
         cmd = ["pw-record", "--raw", "--rate", str(RATE), "--channels", "1",
                "--format", "s16", "--latency", "100ms"]
-        props = [f'media.name="{self.name} ({"micrófono" if self.kind == "mic" else "sistema"})"',
+        props = [f'media.name="{self.name} ({"microphone" if self.kind == "mic" else "system audio"})"',
                  'application.name="Dictado"', 'application.icon-name="audio-input-microphone"']
         if self.kind == "system":
             props.append("stream.capture.sink=true")
@@ -93,7 +93,7 @@ class Capture:
             block = pcm16_to_float(pending)
             pending = b""
             if t0 is None:
-                # El primer bloque terminó ahora: su inicio fue hace 100 ms.
+                # The first block just ended: it started 100 ms ago.
                 t0 = time.time() - BLOCK_SECONDS
             self.callback(block, t0 + samples / RATE)
             samples += block.size
@@ -117,11 +117,11 @@ class Capture:
 
 
 class Segmenter:
-    """Corta un flujo continuo en frases usando la energía (VAD simple).
+    """Cut a continuous stream into phrases by energy (a simple VAD).
 
-    Emite (audio, inicio_unix) cuando hay ≥ `min_silence` de silencio tras
-    voz, o cuando la frase llega a `max_seconds`. El umbral se adapta al
-    ruido de fondo. Whisper vuelve a filtrar con su VAD (Silero).
+    Emits (audio, unix_start) after `min_silence` of silence following speech,
+    or when a phrase reaches `max_seconds`. The threshold adapts to the
+    background noise. Whisper filters again with its own VAD (Silero).
     """
 
     def __init__(self, emit: Callable[[np.ndarray, float], None], *,
@@ -140,11 +140,11 @@ class Segmenter:
         self._speech = 0.0
         self._silence = 0.0
         self._recent: list[tuple[np.ndarray, float]] = []
-        self.position = 0.0  # hora unix hasta la que ya se procesó el audio
+        self.position = 0.0  # unix time up to which audio has been processed
 
     @property
     def open_since(self) -> float | None:
-        """Inicio de la frase en curso (aún sin emitir), si la hay."""
+        """Start of the phrase in progress (not emitted yet), if any."""
         return self._start if self._blocks else None
 
     def threshold(self) -> float:
@@ -152,8 +152,8 @@ class Segmenter:
 
     def feed(self, block: np.ndarray, t: float) -> None:
         level = rms(block)
-        # Ruido de fondo = percentil 20 de los últimos ~10 s: sube con un
-        # ventilador o un micro ruidoso y baja cuando la sala se calla.
+        # Background noise = 20th percentile of the last ~10 s: it rises with a
+        # fan or a noisy mic and drops when the room goes quiet.
         self._levels.append(level)
         if len(self._levels) > 100:
             self._levels.pop(0)

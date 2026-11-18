@@ -1,4 +1,4 @@
-"""Transcribir un archivo de audio o vídeo a un .txt junto a él."""
+"""Transcribe an audio or video file to a .txt next to it."""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ def transcribe_file(engine: Engine, model: str, source: Path, out: Path | None =
     audio = decode_file(str(source))
     result = engine.transcribe(audio, model, beam_size=5, progress=progress)
     with open(out, "w", encoding="utf-8") as f:
-        f.write(f"# {source.name} — idioma: {result.language}\n\n")
+        f.write(f"# {source.name} — language: {result.language}\n\n")
         for seg in result.segments:
             f.write(f"[{stamp(seg.start)}] {seg.text}\n")
     if progress:

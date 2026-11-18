@@ -1,7 +1,8 @@
-"""Configuración en ~/.config/dictado/config.toml (todas las claves son opcionales)."""
+"""Settings in ~/.config/dictado/config.toml (every key is optional)."""
 
 from __future__ import annotations
 
+import hashlib
 import os
 import tomllib
 from dataclasses import dataclass, field, fields
@@ -11,41 +12,49 @@ CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / 
 CONFIG_FILE = CONFIG_DIR / "config.toml"
 
 DEFAULT_TOML = """\
-# Configuración de Dictado. Borra una línea para volver al valor por defecto.
+# Dictado settings. Delete a line to go back to its default.
+# After changing this file: systemctl --user restart dictado
 
-# Modelos Whisper: tiny, base, small, medium, large-v3-turbo...
-# Se descargan una sola vez a ~/.cache/huggingface.
+# Whisper models: tiny, base, small, medium, large-v3-turbo...
+# They are downloaded once to ~/.cache/huggingface.
+# dictation_model is used for dictation, files and your voice in live mode;
+# transcription_model for the system audio in live mode.
 dictation_model = "small"
 transcription_model = "base"
 
-# Modelo pequeño que solo detecta el idioma (vacío = el mismo modelo).
+# Small model used only to detect the language (empty = the same model).
 detect_model = "tiny"
 
-# Idiomas permitidos para la detección automática ("es", "en"...).
-# Con un solo idioma no se detecta nada y es algo más rápido.
+# Languages to recognize. The language is detected phrase by phrase, so you
+# can switch between them in the same recording. With a single language
+# nothing is detected and it is a little faster.
 languages = ["es", "en"]
 
-# Hilos de CPU para Whisper (0 = automático).
+# CPU threads for Whisper (0 = automatic).
 cpu_threads = 0
 
-# Guardar cada dictado con hora en <dictation_dir>/AAAA-MM-DD.txt
+# Save every dictation with its time to <dictation_dir>/YYYY-MM-DD.txt
 save_dictations = true
-dictation_dir = "~/Documents/Dictados"
+dictation_dir = "~/Documents/Dictations"
 
-# Carpeta de las transcripciones en vivo.
-transcripts_dir = "~/Documents/Transcripciones"
+# Folder for live transcripts.
+transcripts_dir = "~/Documents/Transcripts"
 
-# Micrófono (nombre de nodo de PipeWire; vacío = el predeterminado).
-# Con altavoces puedes usar "echo-cancel-source" (ver README).
+# Microphone (PipeWire node name; empty = the default one).
+# With speakers you can use "echo-cancel-source" (see the README).
 mic_source = ""
 
-# Etiquetas de cada fuente.
-mic_label = "Yo"
-system_label = "Otros"
+# Labels for each source in live transcripts.
+mic_label = "Me"
+system_label = "Others"
 
-# Descartar frases del micrófono que repiten lo que suena por los altavoces.
+# Drop microphone phrases that repeat what the speakers are playing.
 echo_filter = true
 """
+
+# SHA-256 of the config file written by version 0.1.0 (Spanish defaults).
+# If it was never edited, it is replaced by the current defaults.
+_OLD_DEFAULTS = {"13f326e7dd5de5a20b4016334f9a25e4f27f4e04fcf39accee04c827143208d7"}
 
 
 @dataclass
@@ -56,11 +65,11 @@ class Config:
     languages: list[str] = field(default_factory=lambda: ["es", "en"])
     cpu_threads: int = 0
     save_dictations: bool = True
-    dictation_dir: str = "~/Documents/Dictados"
-    transcripts_dir: str = "~/Documents/Transcripciones"
+    dictation_dir: str = "~/Documents/Dictations"
+    transcripts_dir: str = "~/Documents/Transcripts"
     mic_source: str = ""
-    mic_label: str = "Yo"
-    system_label: str = "Otros"
+    mic_label: str = "Me"
+    system_label: str = "Others"
     echo_filter: bool = True
 
     @property
@@ -91,9 +100,16 @@ def load(path: Path = CONFIG_FILE) -> Config:
     return cfg
 
 
+def is_old_default(text: str) -> bool:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest() in _OLD_DEFAULTS
+
+
 def write_default(path: Path = CONFIG_FILE) -> bool:
+    """Write the default settings, or upgrade an untouched 0.1.0 file."""
     if path.exists():
-        return False
+        text = path.read_text(encoding="utf-8")
+        if not is_old_default(text):
+            return False
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(DEFAULT_TOML, encoding="utf-8")
     return True

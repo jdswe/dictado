@@ -1,4 +1,4 @@
-"""Dictado: graba solo el micrófono y lo transcribe al soltar/parar."""
+"""Dictation: records the microphone only and transcribes it on release/stop."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ class Recorder:
         with self._lock:
             self._blocks.append(block)
         if self.on_level:
-            # Nivel 0..1 aproximado (escala logarítmica, -60 dB .. 0 dB).
+            # Approximate 0..1 level (log scale, -60 dB .. 0 dB).
             level = rms(block)
             db = 20 * np.log10(max(level, 1e-6))
             self.on_level(float(np.clip((db + 60) / 60, 0, 1)))

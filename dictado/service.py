@@ -1,4 +1,4 @@
-"""Servicio D-Bus (bus de sesión) que coordina dictado, transcripción y archivos."""
+"""D-Bus service (session bus) that runs dictation, live transcription and files."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ XML = (Path(__file__).parent / "dev.dictado.Dictado1.xml").read_text(encoding="u
 
 def notify(summary: str, body: str = "", icon: str = "audio-input-microphone-symbolic",
            urgent: bool = False) -> None:
-    """Notificación de escritorio (org.freedesktop.Notifications)."""
+    """Desktop notification (org.freedesktop.Notifications)."""
     try:
         hints = {"urgency": GLib.Variant("y", 2 if urgent else 1)}
         Gio.bus_get_sync(Gio.BusType.SESSION).call(
@@ -32,7 +32,7 @@ def notify(summary: str, body: str = "", icon: str = "audio-input-microphone-sym
             GLib.Variant("(susssasa{sv}i)", ("Dictado", 0, icon, summary, body, [], hints, -1)),
             None, Gio.DBusCallFlags.NONE, -1, None, None, None)
     except Exception:  # noqa: BLE001
-        log.debug("No se pudo notificar", exc_info=True)
+        log.debug("Could not notify", exc_info=True)
 
 
 class Service:
@@ -60,7 +60,7 @@ class Service:
             self.conn.emit_signal(None, OBJECT_PATH, INTERFACE, name, GLib.Variant(f"({sig})", args))
 
     def emit(self, name: str, sig: str, *args) -> None:
-        """Seguro desde cualquier hilo."""
+        """Safe from any thread."""
         GLib.idle_add(lambda: (self._emit(name, sig, *args), False)[1])
 
     def _props(self) -> dict:
@@ -88,10 +88,10 @@ class Service:
             result = handler(*params.unpack())
             invocation.return_value(result)
         except Exception as e:  # noqa: BLE001
-            log.exception("Error en %s", method)
+            log.exception("Error in %s", method)
             invocation.return_dbus_error(f"{BUS_NAME}.Error", str(e))
 
-    # -- modelo -----------------------------------------------------------
+    # -- models ---------------------------------------------------------
     def preload(self) -> None:
         def run():
             try:
@@ -101,11 +101,11 @@ class Service:
                 self.model_ready = True
                 GLib.idle_add(lambda: (self._state_changed(), False)[1])
             except Exception as e:  # noqa: BLE001
-                log.exception("No se pudo cargar el modelo")
-                self.emit("Error", "s", f"No se pudo cargar el modelo: {e}")
+                log.exception("Could not load the model")
+                self.emit("Error", "s", f"Could not load the speech model: {e}")
         threading.Thread(target=run, name="preload", daemon=True).start()
 
-    # -- dictado ----------------------------------------------------------
+    # -- dictation -------------------------------------------------------
     def dbus_StartDictation(self):
         if self.dictation != "idle":
             return None
@@ -135,12 +135,12 @@ class Service:
         try:
             result = self.engine.transcribe(audio, self.cfg.dictation_model, beam_size=5)
             text, language = result.text, result.language
-            log.info("Dictado (%.1fs de audio en %.1fs): %s", audio.size / 16000,
-                     time.monotonic() - t0, text)
+            log.info("Dictation (%.1fs of audio in %.1fs, %s): %s", audio.size / 16000,
+                     time.monotonic() - t0, language, text)
             if text and self.cfg.save_dictations:
                 save_dictation(self.cfg.dictation_path, text)
         except Exception as e:  # noqa: BLE001
-            log.exception("Error en el dictado")
+            log.exception("Dictation error")
             self.emit("Error", "s", str(e))
 
         def done():
@@ -167,13 +167,13 @@ class Service:
             return self.dbus_StartDictation()
         return None
 
-    # -- transcripción en vivo -------------------------------------------
+    # -- live transcription ----------------------------------------------
     def dbus_StartTranscription(self):
         if self.live:
             return GLib.Variant("(s)", (str(self.live.path),))
         path = transcript_path(self.cfg.transcripts_path)
         self.live = LiveTranscription(
-            self.engine, self.cfg.transcription_model, path,
+            self.engine, {"mic": self.cfg.dictation_model, "system": self.cfg.transcription_model}, path,
             mic_target=self.cfg.mic_source,
             labels={"mic": self.cfg.mic_label, "system": self.cfg.system_label},
             echo_filter=self.cfg.echo_filter,
@@ -182,8 +182,8 @@ class Service:
         self.live.start()
         self.transcription = "recording"
         self._state_changed()
-        notify("Grabando y transcribiendo",
-               "Se graba tu micrófono y el audio del sistema. Avisa a las demás personas.",
+        notify("Recording and transcribing",
+               "Your microphone and the system audio are being recorded. Let everyone know.",
                icon="media-record-symbolic", urgent=True)
         return GLib.Variant("(s)", (str(path),))
 
@@ -197,7 +197,7 @@ class Service:
 
         def finish():
             live.stop()
-            notify("Transcripción guardada", path, icon="document-save-symbolic")
+            notify("Transcript saved", path, icon="document-save-symbolic")
         threading.Thread(target=finish, name="stop-live", daemon=True).start()
         return GLib.Variant("(s)", (path,))
 
@@ -208,13 +208,13 @@ class Service:
             self.dbus_StartTranscription()
         return None
 
-    # -- archivos ---------------------------------------------------------
+    # -- files ------------------------------------------------------------
     def dbus_TranscribeFile(self, path: str):
         src = Path(path).expanduser()
         if not src.is_file():
-            raise FileNotFoundError(f"No existe: {src}")
+            raise FileNotFoundError(f"No such file: {src}")
         out = output_path(src)
-        # Reserva el nombre para que dos peticiones no escriban el mismo .txt
+        # Reserve the name so two requests never write the same .txt
         out.touch()
 
         def run():
@@ -228,9 +228,9 @@ class Service:
                 try:
                     transcribe_file(self.engine, self.cfg.dictation_model, src, out, progress)
                     self.emit("FileDone", "ss", str(src), str(out))
-                    notify("Archivo transcrito", str(out), icon="document-save-symbolic")
+                    notify("File transcribed", str(out), icon="document-save-symbolic")
                 except Exception as e:  # noqa: BLE001
-                    log.exception("Error transcribiendo %s", src)
+                    log.exception("Error transcribing %s", src)
                     self.emit("Error", "s", f"{src.name}: {e}")
         threading.Thread(target=run, name="file", daemon=True).start()
         return GLib.Variant("(s)", (str(out),))
@@ -262,11 +262,11 @@ def serve() -> int:
         service.register(conn)
 
     def on_name(_conn, name):
-        log.info("Servicio %s listo", name)
+        log.info("Service %s ready", name)
         service.preload()
 
     def on_lost(_conn, name):
-        log.error("No se pudo obtener %s (¿ya hay otro servicio en marcha?)", name)
+        log.error("Could not own %s (is another instance running?)", name)
         loop.quit()
 
     Gio.bus_own_name(Gio.BusType.SESSION, BUS_NAME, Gio.BusNameOwnerFlags.NONE,

@@ -1,4 +1,4 @@
-"""Dictado: dictado por voz y transcripción local para GNOME (Wayland)."""
+"""Dictado: local voice dictation and transcription for GNOME (Wayland)."""
 
 __version__ = "0.1.0"
 

@@ -1,9 +1,9 @@
-"""Filtro de eco por texto.
+"""Text-based echo filter.
 
-Con altavoces, el micrófono también capta lo que dicen los demás. Como el
-audio del sistema se transcribe por separado, una frase del micrófono cuyas
-palabras ya aparecen en lo que sonó por los altavoces en ese mismo momento
-es eco: se descarta. Con auriculares nunca se activa.
+With speakers, the microphone also picks up what the others say. Since the
+system audio is transcribed separately, a microphone phrase whose words
+already appear in what the speakers played at that same moment is echo and is
+dropped. With headphones it never triggers.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ def words(text: str) -> list[str]:
 
 
 def echo_ratio(mic_text: str, system_text: str) -> float:
-    """Fracción de palabras del micrófono que también están en el sistema."""
+    """Fraction of the microphone's words that are also in the system audio."""
     mic = words(mic_text)
     if not mic:
         return 0.0
@@ -37,10 +37,10 @@ def echo_ratio(mic_text: str, system_text: str) -> float:
 
 
 def is_echo(mic_text: str, system_texts: list[str], threshold: float = 0.6) -> bool:
-    """`system_texts`: frases del sistema que se solapan en el tiempo."""
+    """`system_texts`: system phrases that overlap in time."""
     if not system_texts:
         return False
     mic = words(mic_text)
-    # Con una o dos palabras ("sí", "vale") hace falta coincidencia total.
+    # With one or two words ("yes", "ok") it takes a full match.
     needed = 1.0 if len(mic) <= 2 else threshold
     return echo_ratio(mic_text, " ".join(system_texts)) >= needed

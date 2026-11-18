@@ -1,10 +1,10 @@
-"""Transcripción en vivo: micrófono («Yo») + audio del sistema («Otros»).
+"""Live transcription: microphone ("Me") + system audio ("Others").
 
-Cada fuente se captura y se corta en frases por separado. Las frases se
-transcriben en un hilo de trabajo y se escriben al archivo en orden de
-tiempo, en cuanto ninguna de las dos fuentes puede producir ya algo anterior
-(marca de agua). Cada línea se escribe y se vacía a disco al momento, así que
-si el proceso se corta no se pierde lo ya escrito.
+Each source is captured and cut into phrases separately. Phrases are
+transcribed on a worker thread and written to the file in time order as soon
+as neither source can still produce anything earlier (a watermark). Every
+line is written and flushed to disk immediately, so nothing already written
+is lost if the process stops.
 """
 
 from __future__ import annotations
@@ -26,13 +26,13 @@ from dictado.engine import Engine
 
 log = logging.getLogger(__name__)
 
-ECHO_WINDOW = 2.5  # segundos de margen para buscar el eco en el otro canal
+ECHO_WINDOW = 2.5  # seconds of slack when looking for echo in the other channel
 
 
 @dataclass
 class Line:
     source: str  # "mic" | "system"
-    start: float  # hora unix
+    start: float  # unix time
     end: float
     text: str
 
@@ -49,7 +49,7 @@ def transcript_path(folder: Path, when: dt.datetime | None = None) -> Path:
 
 
 class Merger:
-    """Ordena por tiempo las líneas de las dos fuentes y quita el eco."""
+    """Orders both sources' lines by time and drops the echo."""
 
     def __init__(self, write: Callable[[Line], None], echo_filter: bool = True):
         self.write = write
@@ -61,11 +61,11 @@ class Merger:
         self.pending.append(line)
 
     def flush(self, watermark: float) -> None:
-        """Escribe las líneas que ya no pueden quedar desordenadas."""
+        """Write the lines that can no longer end up out of order."""
         margin = ECHO_WINDOW if self.echo_filter else 0.0
         self.pending.sort(key=lambda l: l.start)
         ready = [l for l in self.pending if l.end + margin <= watermark]
-        # Solo se escribe un prefijo continuo para respetar el orden.
+        # Only a contiguous prefix is written, to keep the order.
         count = 0
         for line in self.pending:
             if line in ready:
@@ -82,8 +82,8 @@ class Merger:
                 continue
             self.write(line)
         if out:
-            # Lo que queda pendiente empieza después de lo escrito: basta con
-            # recordar el sistema de la última ventana de eco.
+            # What is still pending starts after what was written: remembering
+            # the system lines of the last echo window is enough.
             cutoff = out[-1].start - 4 * ECHO_WINDOW
             self.recent_system = [l for l in self.recent_system if l.end >= cutoff]
 
@@ -98,14 +98,16 @@ class Merger:
 
 
 class LiveTranscription:
-    def __init__(self, engine: Engine, model: str, path: Path, *, mic_target: str = "",
+    def __init__(self, engine: Engine, models: dict[str, str], path: Path, *, mic_target: str = "",
                  labels: dict[str, str] | None = None, echo_filter: bool = True,
                  on_line: Callable[[str, str, float], None] | None = None,
                  on_error: Callable[[str], None] | None = None):
         self.engine = engine
-        self.model = model
+        # Your own voice ("mic") can use a more accurate model than the
+        # system audio, which runs continuously.
+        self.models = models
         self.path = path
-        self.labels = labels or {"mic": "Yo", "system": "Otros"}
+        self.labels = labels or {"mic": "Me", "system": "Others"}
         self.on_line = on_line
         self.on_error = on_error
         self.started = time.time()
@@ -126,14 +128,14 @@ class LiveTranscription:
         self._ticker: threading.Thread | None = None
         self._running = False
 
-    # -- ciclo de vida -------------------------------------------------
+    # -- lifecycle --------------------------------------------------------
     def start(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._file = open(self.path, "a", encoding="utf-8", buffering=1)
         now = dt.datetime.now()
         self._file.write(
-            f"# Transcripción {now:%Y-%m-%d %H:%M}\n"
-            f"# {self.labels['mic']} = micrófono · {self.labels['system']} = audio del sistema\n\n")
+            f"# Transcript {now:%Y-%m-%d %H:%M}\n"
+            f"# {self.labels['mic']} = microphone · {self.labels['system']} = system audio\n\n")
         self._sync()
         self._running = True
         self._worker.start()
@@ -154,7 +156,7 @@ class LiveTranscription:
         with self._lock:
             self._merger.flush_all()
         if self._file:
-            self._file.write(f"\n# Fin {dt.datetime.now():%H:%M:%S}\n")
+            self._file.write(f"\n# End {dt.datetime.now():%H:%M:%S}\n")
             self._sync()
             self._file.close()
             self._file = None
@@ -164,13 +166,13 @@ class LiveTranscription:
     def elapsed(self) -> float:
         return time.time() - self.started
 
-    # -- captura -> frases -> trabajos ----------------------------------
+    # -- capture -> phrases -> jobs ----------------------------------------
     def _feed(self, source: str, block: np.ndarray, t: float) -> None:
         with self._lock:
             self._segmenters[source].feed(block, t)
 
     def _enqueue(self, source: str, audio: np.ndarray, start: float) -> None:
-        # Se llama con self._lock tomado.
+        # Called with self._lock held.
         self._inflight[source].append(start)
         self._jobs.put((start, source, audio))
 
@@ -181,9 +183,9 @@ class LiveTranscription:
                 return
             start, source, audio = job
             try:
-                result = self.engine.transcribe(audio, self.model, beam_size=1)
+                result = self.engine.transcribe(audio, self.models[source], beam_size=1)
             except Exception as e:  # noqa: BLE001
-                log.exception("Error transcribiendo")
+                log.exception("Transcription error")
                 if self.on_error:
                     self.on_error(str(e))
                 result = None
@@ -201,7 +203,7 @@ class LiveTranscription:
                 self._merger.flush(self._watermark())
 
     def _watermark(self) -> float:
-        """Hora antes de la cual ya no puede llegar ninguna frase nueva."""
+        """Time before which no new phrase can arrive any more."""
         marks = []
         for src, seg in self._segmenters.items():
             candidates = [seg.position]
@@ -211,7 +213,7 @@ class LiveTranscription:
             marks.append(min(candidates))
         return min(marks)
 
-    # -- salida ---------------------------------------------------------
+    # -- output -----------------------------------------------------------
     def _write(self, line: Line) -> None:
         stamp = dt.datetime.fromtimestamp(line.start).strftime("%H:%M:%S")
         label = self.labels[line.source]
